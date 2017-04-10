@@ -1,0 +1,45 @@
+
+# TODO:
+# Decide on a pin location for:
+#     NET "B1MHz"    LOC = "P??";     # output
+# Consider moving Phi0 to a GCK pin (23 or 27)
+# NET "Phi0"     BUFG=CLK;
+
+NET "CLK16MHz" BUFG=CLK;
+NET "CLK16MHz" PERIOD=62.5;
+
+NET "A(7)"     LOC = "P1";      # input
+NET "A(6)"     LOC = "P6";      # input
+NET "A(5)"     LOC = "P8";      # input
+NET "A(4)"     LOC = "P9";      # input
+NET "nOE2"     LOC = "P10";     # output
+NET "nOE1"     LOC = "P11";     # output
+NET "nCE1"     LOC = "P12";     # output
+NET "nCE2"     LOC = "P13";     # output
+#NET "A(1)"     LOC = "P14";     # input
+#NET "A(0)"     LOC = "P15";     # input
+#NET "A(3)"     LOC = "P16";     # input
+#NET "A(2)"     LOC = "P17";     # input
+NET "nCE13"    LOC = "P18";     # output
+NET "nROM13"   LOC = "P20";     # input
+NET "CLK16MHz" LOC = "P22";     # input
+NET "nROE"     LOC = "P25";     # input
+NET "nRST"     LOC = "P29";     # input
+NET "Phi0"     LOC = "P32";     # input
+NET "nPFC"     LOC = "P36";     # input
+NET "nPFD"     LOC = "P39";     # input
+NET "QA"       LOC = "P40";     # input
+NET "NMID"     LOC = "P42";     # output
+NET "R13D"     LOC = "P68";     # input
+NET "R13256KS" LOC = "P70";     # input
+NET "BnPFC"    LOC = "P71";     # output
+NET "BRnW"     LOC = "P72";     # output
+NET "nNMI1MHz" LOC = "P74";     # input
+NET "BnPFD"    LOC = "P85";     # output
+NET "DIRA"     LOC = "P86";     # output
+NET "BnRW"     LOC = "P87";     # output
+NET "nSELA"    LOC = "P91";     # output
+NET "nSELB"    LOC = "P92";     # output
+NET "A14"      LOC = "P93";     # output
+NET "RnW"      LOC = "P94";     # input
+NET "nFCBx"    LOC = "P95";     # output
