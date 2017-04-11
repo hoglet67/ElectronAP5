@@ -20,7 +20,8 @@ entity ElectronAP5 is
         nROE:     in  std_logic;
         nROM13:   in  std_logic;
         nRST:     in  std_logic;
-        LKD:      in  std_logic;
+        LKD02:    in  std_logic;
+        LKD13:    in  std_logic;
         Phi0:     in  std_logic;
         QA:       in  std_logic;
         R13256KS: in  std_logic;
@@ -38,11 +39,11 @@ entity ElectronAP5 is
         nCE2:     out std_logic;
         nFCBx:    out std_logic;
         NMID:     out std_logic;
+        nOE13:    out std_logic;
         nOE1:     out std_logic;
         nOE2:     out std_logic;
-        RnW1:     out std_logic;
-        RnW2:     out std_logic;
-        RnW13:    out std_logic;
+        S1RnW:    out std_logic;
+        S2Rnw:    out std_logic;
         nSELA:    out std_logic;
         nSELB:    out std_logic
     );
@@ -149,8 +150,12 @@ begin
 
     -- Software Write Enables for the two ROMs
     --
-    -- AEN enables weite to ROM 0/2
-    -- BEN enables weite to ROM 1/3
+    -- In 16K Mode
+    --   AEN enables write to ROM 0/2
+    --   BEN enables write to ROM 1/3
+    -- In 32K Mode
+    --   AEN enables write to lower half of ROM 1/3
+    --   BEN enables write to upper half of ROM 1/3
     -- These registers should power up to locked (0)
     --
     -- Write to &FCDC - Unlock ROM 0/2
@@ -163,10 +168,9 @@ begin
     process(Phi0)
     begin
         if falling_edge(Phi0) then
-            if LKD = '0' then
+            if LKD02 = '0' then
                 -- lock disable jumper present
                 AEN <= '1';
-                BEN <= '1';
             else
                 -- lock disable jumper absent
                 if A = x"DC" and nPFC = '0' and RnW = '0' then
@@ -175,6 +179,12 @@ begin
                 if A = x"DD" and nPFC = '0' and RnW = '0' then
                     AEN <= '0';
                 end if;
+            end if;
+            if LKD13 = '0' then
+                -- lock disable jumper present
+                BEN <= '1';
+            else
+                -- lock disable jumper absent
                 if A = x"DE" and nPFC = '0' and RnW = '0' then
                     BEN <= '1';
                 end if;
@@ -185,28 +195,28 @@ begin
         end if;
     end process;
 
-    -- RnW13, jumper on R13D disables this ROM
-    RnW13 <= RnW when R13D = '1' else '1';
-
-    -- nCE13, jumper on R13D disables this ROM
+    -- nCE13 enabled ROM13, jumper on R13D disables this ROM
     nCE13 <= nROM13 when R13D = '1' else '1';
 
-    -- RnW1 drives ROM 0/2
-    RnW1 <= '0' when RnW = '0' and AEN ='1' and Phi0 = '1' else '1';
+    -- nOE13 drivs ROM13
+    nOE13 <= '0' when RnW = '1' else '1';
+
+    -- S1RnW drives ROM 0/2
+    S1RnW <= '0' when RnW = '0' and AEN ='1' and Phi0 = '1' else '1';
 
     -- nOE1 drives ROM 0/2
     nOE1 <= '0' when RnW = '1' else '1';
 
-    -- nCE1 drives ROM 0/2 - disable (and use nCE2) when 256K jumper is present
+    -- nCE1 enables ROM 0/2 - disable (and use nCE2) when 256K jumper is present
     nCE1 <= '0' when nROE = '0' and (QA = '0' and R13256KS = '1') else '1';
 
-    -- RnW2 drives ROM 1/3
-    RnW2 <= '0' when RnW = '0' and BEN ='1' and Phi0 = '1' else '1';
+    -- S2Rnw drives ROM 1/3
+    S2Rnw <= '0' when RnW = '0' and ((QA = '0' and R13256KS = '0' and AEN = '1') or BEN = '1') and Phi0 = '1' else '1';
 
     -- nOE2 drives ROM 1/3
     nOE2 <= '0' when RnW = '1' else '1';
 
-    -- nCE2 drives ROM 1/3 - enable (instead of nCE1) when 256K jumper is present
+    -- nCE2 enables ROM 1/3 - enable (instead of nCE1) when 256K jumper is present
     nCE2 <= '0' when nROE = '0' and (QA = '1' or R13256KS = '0') else '1';
 
     -- A14 drives ROM 1/3 from QA when the 256K jumper is present

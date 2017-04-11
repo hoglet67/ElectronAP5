@@ -1,14 +1,11 @@
-
-# TODO:
-# Decide on pin locations for:
-# NET "RnW1"     LOC = "P??";      # output
-# NET "RnW2"     LOC = "P??";      # output
-# NET "RnW13"    LOC = "P??";      # output
-
-# Consider moving Phi0 to a GCK pin (23 or 27)
-# NET "Phi0"     BUFG=CLK;
-
+# Global Clock Nets
+NET "Phi0"     BUFG=CLK;
 NET "CLK16MHz" BUFG=CLK;
+NET "RnW"      BUFG=DATA_GATE;
+
+# 2MHz clock domain
+NET "Phi0" TNM_NET = clk_period_grp_2;
+TIMESPEC TS_clk_period_2 = PERIOD "clk_period_grp_2" 500ns LOW;
 
 # 16MHz clock domain
 NET "CLK16MHz" TNM_NET = clk_period_grp_16;
@@ -28,26 +25,32 @@ NET "A(3)"     LOC = "P16";     # input
 NET "A(2)"     LOC = "P17";     # input
 NET "nCE13"    LOC = "P18";     # output
 NET "nROM13"   LOC = "P20";     # input
-NET "CLK16MHz" LOC = "P22";     # input
+NET "RnW"      LOC = "P22";     # input
+NET "CLK16MHz" LOC = "P23";     # input
 NET "nROE"     LOC = "P25";     # input
-NET "nRST"     LOC = "P29";     # input
-NET "Phi0"     LOC = "P32";     # input
+NET "Phi0"     LOC = "P27";     # input
+NET "LKD13"    LOC = "P29";     # input
+NET "LKD02"    LOC = "P30";     # input
+NET "nRST"     LOC = "P33";     # input
 NET "nPFC"     LOC = "P36";     # input
 NET "nPFD"     LOC = "P39";     # input
 NET "QA"       LOC = "P40";     # input
 NET "NMID"     LOC = "P42";     # output
-NET "LKD"      LOC = "P67";     # input
-NET "R13D"     LOC = "P68";     # input
-NET "R13256KS" LOC = "P70";     # input
-NET "BnPFC"    LOC = "P71";     # output
-NET "BRnW"     LOC = "P72";     # output
-NET "nNMI1MHz" LOC = "P74";     # input
+NET "R13D"     LOC = "P67";     # input
+NET "R13256KS" LOC = "P68";     # input
+NET "nNMI1MHz" LOC = "P70";     # input
+NET "BnPFC"    LOC = "P72";     # output
+NET "BRnW"     LOC = "P74";     # output
 NET "B1MHz"    LOC = "P76";     # output
 NET "BnPFD"    LOC = "P85";     # output
 NET "DIRA"     LOC = "P86";     # output
 NET "BnRW"     LOC = "P87";     # output
-NET "nSELA"    LOC = "P91";     # output
-NET "nSELB"    LOC = "P92";     # output
-NET "A14"      LOC = "P93";     # output
-NET "RnW"      LOC = "P94";     # input
-NET "nFCBx"    LOC = "P95";     # output
+NET "nSELA"    LOC = "P89";     # output
+NET "nSELB"    LOC = "P90";     # output
+NET "nOE13"    LOC = "P93";     # output
+NET "A14"      LOC = "P94";     # output
+NET "S2RnW"    LOC = "P95";     # output
+NET "S1RnW"    LOC = "P96";     # output
+NET "nFCBx"    LOC = "P97";     # output
+
+
