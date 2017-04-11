@@ -139,7 +139,7 @@ begin
     begin
         if (nRST = '0') then
             NMID <= '0';
-        elsif rising_edge(Phi0) then
+        elsif falling_edge(Phi0) then
             NMID <= nNMI1MHz;
         end if;
     end process;
