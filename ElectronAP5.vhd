@@ -198,7 +198,7 @@ begin
     nOE1 <= '0' when RnW = '1' else '1';
 
     -- nCE1 drives ROM 0/2 - disable (and use nCE2) when 256K jumper is present
-    nCE1 <= '0' when nROE = '0' and (QA = '0' and R13256KS = '0') else '1';
+    nCE1 <= '0' when nROE = '0' and (QA = '0' and R13256KS = '1') else '1';
 
     -- RnW2 drives ROM 1/3
     RnW2 <= '0' when RnW = '0' and BEN ='1' and Phi0 = '1' else '1';
@@ -207,10 +207,10 @@ begin
     nOE2 <= '0' when RnW = '1' else '1';
 
     -- nCE2 drives ROM 1/3 - enable (instead of nCE1) when 256K jumper is present
-    nCE2 <= '0' when nROE = '0' and (QA = '1' or R13256KS = '1') else '1';
+    nCE2 <= '0' when nROE = '0' and (QA = '1' or R13256KS = '0') else '1';
 
     -- A14 drives ROM 1/3 from QA when the 256K jumper is present
-    A14 <= QA when R13256KS = '1' else '1';
+    A14 <= QA when R13256KS = '0' else '1';
 
     -- =============================================
     -- Tube
