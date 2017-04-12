@@ -12,43 +12,43 @@ use ieee.numeric_std.all;
 
 entity ElectronAP5 is
     Port (
-        A:        in  std_logic_vector(13 downto 0);
-        CLK16MHz: in  std_logic;
-        D:        in  std_logic_vector(7 downto 0);
-        nNMI1MHz: in  std_logic;
-        nPFC:     in  std_logic;
-        nPFD:     in  std_logic;
-        nROE:     in  std_logic;
-        nROM13:   in  std_logic;
-        nRST:     in  std_logic;
-        LKD02:    in  std_logic;
-        LKD13:    in  std_logic;
-        MMCM:     in  std_logic;
-        Phi0:     in  std_logic;
-        QA:       in  std_logic;
-        R13256KS: in  std_logic;
-        R13D:     in  std_logic;
-        RnW:      in  std_logic;
-        A14:      out std_logic;
-        B1MHz:    out std_logic;
-        BnPFC:    out std_logic;
-        BnPFD:    out std_logic;
-        BnRW:     out std_logic;
-        BRnW:     out std_logic;
-        BRnW13:   out std_logic;
-        DIRA:     out std_logic;
-        nCE13:    out std_logic;
-        nCE1:     out std_logic;
-        nCE2:     out std_logic;
-        nFCBx:    out std_logic;
-        NMID:     out std_logic;
-        nOE13:    out std_logic;
-        nOE1:     out std_logic;
-        nOE2:     out std_logic;
-        S1RnW:    out std_logic;
-        S2RnW:    out std_logic;
-        nSELA:    out std_logic;
-        nSELB:    out std_logic
+        A:        in    std_logic_vector(13 downto 0);
+        CLK16MHz: in    std_logic;
+        nNMI1MHz: in    std_logic;
+        nPFC:     in    std_logic;
+        nPFD:     in    std_logic;
+        nROE:     in    std_logic;
+        nROM13:   in    std_logic;
+        nRST:     in    std_logic;
+        LKD02:    in    std_logic;
+        LKD13:    in    std_logic;
+        MMCM:     in    std_logic;
+        Phi0:     in    std_logic;
+        QA:       in    std_logic;
+        R13256KS: in    std_logic;
+        R13D:     in    std_logic;
+        RnW:      in    std_logic;
+        A14:      out   std_logic;
+        B1MHz:    out   std_logic;
+        BnPFC:    out   std_logic;
+        BnPFD:    out   std_logic;
+        BnRW:     out   std_logic;
+        BRnW:     out   std_logic;
+        BRnW13:   out   std_logic;
+        DIRA:     out   std_logic;
+        nCE13:    out   std_logic;
+        nCE1:     out   std_logic;
+        nCE2:     out   std_logic;
+        nFCBx:    out   std_logic;
+        NMID:     out   std_logic;
+        nOE13:    out   std_logic;
+        nOE1:     out   std_logic;
+        nOE2:     out   std_logic;
+        S1RnW:    out   std_logic;
+        S2RnW:    out   std_logic;
+        nSELA:    out   std_logic;
+        nSELB:    out   std_logic;
+        D:        inout std_logic_vector(7 downto 0)
     );
 end ElectronAP5;
 
@@ -67,7 +67,31 @@ signal syncCount : unsigned(3 downto 0);
 signal AEN       : std_logic := '0';
 signal BEN       : std_logic := '0';
 
+signal test      : std_logic_vector(7 downto 0);
+
 begin
+
+    -- =============================================
+    -- Test Register
+    -- =============================================
+
+    -- Initialized on reset to 0xAA
+    -- Read/Write at &FCD7
+    
+    process(Phi0)
+    begin
+        if falling_edge(Phi0) then
+            if (nRST = '0') then
+                test <= x"AA";
+            elsif nPFC = '0' and RnW = '0' and A(7 downto 0) = x"D7" then
+                test <= D;
+            end if;
+        end if;
+    end process;
+
+    -- Be conservative about bus conflicts by only driving when Phi0 is high
+    D <= test when nPFC = '0' and RnW = '1' and A(7 downto 0) = x"D7" and Phi0 = '1' else
+         "ZZZZZZZZ";
 
     -- =============================================
     -- 1MHz clock generation
