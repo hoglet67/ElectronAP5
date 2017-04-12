@@ -22,6 +22,7 @@ entity ElectronAP5 is
         nRST:     in  std_logic;
         LKD02:    in  std_logic;
         LKD13:    in  std_logic;
+        MMCM:     in  std_logic;
         Phi0:     in  std_logic;
         QA:       in  std_logic;
         R13256KS: in  std_logic;
@@ -33,6 +34,7 @@ entity ElectronAP5 is
         BnPFD:    out std_logic;
         BnRW:     out std_logic;
         BRnW:     out std_logic;
+        BRnW13:   out std_logic;
         DIRA:     out std_logic;
         nCE13:    out std_logic;
         nCE1:     out std_logic;
@@ -195,10 +197,13 @@ begin
         end if;
     end process;
 
+    -- BnRW13 drives ROM13, and is a gated version of RnW
+    BRnW13 <= '0' when RnW = '0' and Phi0 = '1' else '1';
+
     -- nCE13 enabled ROM13, jumper on R13D disables this ROM
     nCE13 <= nROM13 when R13D = '1' else '1';
 
-    -- nOE13 drivs ROM13
+    -- nOE13 drives ROM13
     nOE13 <= '0' when RnW = '1' else '1';
 
     -- S1RnW drives ROM 0/2
