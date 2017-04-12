@@ -12,8 +12,9 @@ use ieee.numeric_std.all;
 
 entity ElectronAP5 is
     Port (
-        A:        in  std_logic_vector(7 downto 0);
+        A:        in  std_logic_vector(13 downto 0);
         CLK16MHz: in  std_logic;
+        D:        in  std_logic_vector(7 downto 0);
         nNMI1MHz: in  std_logic;
         nPFC:     in  std_logic;
         nPFD:     in  std_logic;
@@ -45,7 +46,7 @@ entity ElectronAP5 is
         nOE1:     out std_logic;
         nOE2:     out std_logic;
         S1RnW:    out std_logic;
-        S2Rnw:    out std_logic;
+        S2RnW:    out std_logic;
         nSELA:    out std_logic;
         nSELB:    out std_logic
     );
@@ -175,10 +176,10 @@ begin
                 AEN <= '1';
             else
                 -- lock disable jumper absent
-                if A = x"DC" and nPFC = '0' and RnW = '0' then
+                if A(7 downto 0) = x"DC" and nPFC = '0' and RnW = '0' then
                     AEN <= '1';
                 end if;
-                if A = x"DD" and nPFC = '0' and RnW = '0' then
+                if A(7 downto 0) = x"DD" and nPFC = '0' and RnW = '0' then
                     AEN <= '0';
                 end if;
             end if;
@@ -187,45 +188,91 @@ begin
                 BEN <= '1';
             else
                 -- lock disable jumper absent
-                if A = x"DE" and nPFC = '0' and RnW = '0' then
+                if A(7 downto 0) = x"DE" and nPFC = '0' and RnW = '0' then
                     BEN <= '1';
                 end if;
-                if A = x"DF" and nPFC = '0' and RnW = '0' then
+                if A(7 downto 0) = x"DF" and nPFC = '0' and RnW = '0' then
                     BEN <= '0';
                 end if;
             end if;
         end if;
     end process;
 
-    -- BnRW13 drives ROM13, and is a gated version of RnW
+    -- BnRW13 drives nWE of ROM13, and is a gated version of RnW
     BRnW13 <= '0' when RnW = '0' and Phi0 = '1' else '1';
 
-    -- nCE13 enabled ROM13, jumper on R13D disables this ROM
+    -- nCE13 drives nCE of ROM13, jumper on R13D disables this ROM
     nCE13 <= nROM13 when R13D = '1' else '1';
 
-    -- nOE13 drives ROM13
-    nOE13 <= '0' when RnW = '1' else '1';
+    -- nOE13 drives nOE of ROM13, disable during writes
+    nOE13 <= not RnW;
 
-    -- S1RnW drives ROM 0/2
-    S1RnW <= '0' when RnW = '0' and AEN ='1' and Phi0 = '1' else '1';
+    -- Summary of how ROM mapping is implemented
+    --
+    -- Note: The R13256KS and MMCM jumpers are effectively active low
+    -- i.e. 0 = jumper fitted, 1 = jumper missing
+    --
+    -- Mode:            Inputs:                          Outputs:
+    --                  Mode jumpers:   Address:  ROM:   nCE to   nCE to
+    --                  R13256KS MMCM   A(13:0)   QA     ROM 0/2  ROM 1/3  A14
+    -- normal/16K       1        1      *         0      0        1        1
+    --                  1        1      *         1      1        0        1
+    -- normal/32K       0        1      *         0      1        0        0
+    --                  0        1      *         1      1        0        1
+    -- MMC mode/32K     *        0      *         0      1        0        0
+    --                  *        0      <  &3600  1      1        0        1
+    --                  *        0      >= &3600  1      0        1        1
 
-    -- nOE1 drives ROM 0/2
-    nOE1 <= '0' when RnW = '1' else '1';
+    -- S1RnW drives nWR of ROM 0/2
+    S1RnW <=
+        -- in normal mode, suport locking with AEN and gate with Phi2
+        '0' when MMCM = '1' and RnW = '0' and AEN ='1' and Phi0 = '1' else
+        -- in MMC mode, the RAM is not lockable as it's used for workspace
+        '0' when MMCM = '0' and RnW = '0'              and Phi0 = '1' else
+        -- default to no write
+        '1';
 
-    -- nCE1 enables ROM 0/2 - disable (and use nCE2) when 256K jumper is present
-    nCE1 <= '0' when nROE = '0' and (QA = '0' and R13256KS = '1') else '1';
+    -- nOE1 drives nOE of ROM 0/2, always disable during writes
+    nOE1 <= not RnW;
 
-    -- S2Rnw drives ROM 1/3
-    S2Rnw <= '0' when RnW = '0' and ((QA = '0' and R13256KS = '0' and AEN = '1') or BEN = '1') and Phi0 = '1' else '1';
+    -- nCE1 drives nCE of ROM 0/2
+    nCE1 <=
+        -- in normal mode, enable for even ROM only when the 256K jumper is not fitted
+        '0' when MMCM = '1' and nROE = '0' and (QA = '0' and R13256KS = '1') else
+        -- in MMC mode, enable for odd ROM accesses >= &B600
+        '0' when MMCM = '0' and nROE = '0' and (QA = '1' and A(13 downto 8) >= "110110") else
+        -- default to disabled
+        '1';
 
-    -- nOE2 drives ROM 1/3
-    nOE2 <= '0' when RnW = '1' else '1';
+    -- S2Rnw drives nWE of ROM 1/3
+    S2Rnw <=
+        -- in normal mode, lock based on AEN or BEN depending on the ROM size and bank
+        '0' when MMCM = '1' and RnW = '0' and ((QA = '0' and R13256KS = '0' and AEN = '1') or BEN = '1') and Phi0 = '1' else
+        -- in MMC mode, ignore the 256K jumper as the ROM 1/3 must be 32K
+        '0' when MMCM = '0' and RnW = '0' and ((QA = '0'                    and AEN = '1') or BEN = '1') and Phi0 = '1' else
+        -- default to no write
+        '1';
 
-    -- nCE2 enables ROM 1/3 - enable (instead of nCE1) when 256K jumper is present
-    nCE2 <= '0' when nROE = '0' and (QA = '1' or R13256KS = '0') else '1';
+    -- nOE2 drives nOE of ROM 1/3, always disable during writes
+    nOE2 <= not RnW;
 
-    -- A14 drives ROM 1/3 from QA when the 256K jumper is present
-    A14 <= QA when R13256KS = '0' else '1';
+    -- nCE2 drives nCE of ROM 1/3
+    nCE2 <=
+        -- in normal mode, enable when 256K jumper is present, or for the odd ROM
+        '0' when MMCM = '1' and nROE = '0' and (QA = '1' or R13256KS = '0') else
+        -- in MMC mode, enable for the even ROM,
+        '0' when MMCM = '0' and nROE = '0' and (QA = '0' or A(13 downto 8) < "110110") else
+        -- default to disabled
+        '1';
+
+    -- A14 drives A14 input to ROM 1/3
+    A14 <=
+        -- in normal mode when 256K jumper is present, pass QA through as A14
+        QA when MMCM = '1' and R13256KS = '0' else
+        -- in MMC mode, ignore the 256K jumper as the ROM 1/3 must be 32K
+        QA when MMCM = '0'                    else
+        -- default to A14 = 1
+        '1';
 
     -- =============================================
     -- Tube
@@ -274,4 +321,3 @@ begin
     nFCBx <= '0' when nPFC = '0' and A(7 downto 4) = x"B" else '1';
 
 end Behavorial;
-
