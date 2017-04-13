@@ -4,7 +4,10 @@
 -- Create Date:         10/4/2017
 -- Module Name:         Electron AP5 CPLD
 -- Project Name:        Electron AP5
--- Target Devices:      9572XL
+-- Target Devices:      XC9572
+--
+-- Version:             0.50
+--
 ----------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
@@ -334,7 +337,7 @@ begin
     -- 0: B->A; 1: A->B
     BnRW <= not RnW;
 
-    -- BnRW is just a buffered version of RnW
+    -- BRnW is just a buffered version of RnW
     BRnW <= RnW;
 
     -- =============================================
