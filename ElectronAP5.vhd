@@ -57,6 +57,8 @@ end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
+constant VERSION : std_logic_vector(7 downto 0) := x"51";
+        
 signal BnPFC_int : std_logic;
 signal BnPFD_int : std_logic;
 signal nSELA_int : std_logic;
@@ -69,6 +71,7 @@ signal syncCount : unsigned(3 downto 0);
 
 signal AEN       : std_logic := '0';
 signal BEN       : std_logic := '0';
+signal CEN       : std_logic := '0';
 
 signal test      : std_logic_vector(7 downto 0);
 
@@ -78,14 +81,14 @@ begin
     -- Test Register
     -- =============================================
 
-    -- Initialized on reset to 0xAA
+    -- Initialized on reset to 0x51 (the version number)
     -- Read/Write at &FCD7
     
     process(Phi0)
     begin
         if falling_edge(Phi0) then
             if (nRST = '0') then
-                test <= x"AA";
+                test <= VERSION;
             elsif nPFC = '0' and RnW = '0' and A(7 downto 0) = x"D7" then
                 test <= D;
             end if;
@@ -183,11 +186,15 @@ begin
     -- In 16K Mode
     --   AEN enables write to ROM 0/2
     --   BEN enables write to ROM 1/3
+    --   CEN enables write to ROM 13
     -- In 32K Mode
     --   AEN enables write to lower half of ROM 1/3
     --   BEN enables write to upper half of ROM 1/3
+    --   CEN enables write to ROM 13
     -- These registers should power up to locked (0)
     --
+    -- Write to &FCDA - Unlock ROM 13
+    -- Write to &FCDB - Lock ROM 13
     -- Write to &FCDC - Unlock ROM 0/2
     -- Write to &FCDD - Lock ROM 0/2
     -- Write to &FCDE - Unlock ROM 1/3
@@ -222,11 +229,18 @@ begin
                     BEN <= '0';
                 end if;
             end if;
+            -- no lock disable jumper for rom 13
+            if A(7 downto 0) = x"DA" and nPFC = '0' and RnW = '0' then
+                CEN <= '1';
+            end if;
+            if A(7 downto 0) = x"DB" and nPFC = '0' and RnW = '0' then
+                CEN <= '0';
+            end if;            
         end if;
     end process;
 
     -- BnRW13 drives nWE of ROM13, and is a gated version of RnW
-    BRnW13 <= '0' when RnW = '0' and Phi0 = '1' else '1';
+    BRnW13 <= '0' when RnW = '0' and CEN = '1' and Phi0 = '1' else '1';
 
     -- nCE13 drives nCE of ROM13, jumper on R13D disables this ROM
     nCE13 <= nROM13 when R13D = '1' else '1';
