@@ -120,7 +120,7 @@ begin
 
     process(CLK16MHz)
     begin
-        if falling_edge(CLK16MHZ) then
+        if falling_edge(CLK16MHz) then
             if (nRST = '0') then
                 seenRst <= '1';
             elsif (nLoad = '0') then
@@ -144,7 +144,7 @@ begin
 
     process(CLK16MHz)
     begin
-        if rising_edge(CLK16MHZ) then
+        if rising_edge(CLK16MHz) then
             if (nLoad = '0') then
                 syncCount <= x"1";
             else
