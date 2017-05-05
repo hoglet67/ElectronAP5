@@ -6,7 +6,7 @@
 -- Project Name:        Electron AP5
 -- Target Devices:      XC9572
 --
--- Version:             0.50
+-- Version:             0.52
 --
 ----------------------------------------------------------------------------------
 library ieee;
@@ -57,16 +57,14 @@ end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"51";
-        
+constant VERSION : std_logic_vector(7 downto 0) := x"52";
+
 signal BnPFC_int : std_logic;
 signal BnPFD_int : std_logic;
 signal nSELA_int : std_logic;
 
-signal seenRst   : std_logic := '0';
-signal nLoadIn   : std_logic;
-signal nLoad     : std_logic := '1';
-signal nLoadDash : std_logic := '1';
+signal Phi0S     : std_logic;
+signal state     : std_logic_vector(1 downto 0);
 signal syncCount : unsigned(3 downto 0);
 
 signal AEN       : std_logic := '0';
@@ -83,7 +81,7 @@ begin
 
     -- Initialized on reset to 0x51 (the version number)
     -- Read/Write at &FCD7
-    
+
     process(Phi0)
     begin
         if falling_edge(Phi0) then
@@ -112,49 +110,43 @@ begin
     -- The original design used an RS flip/flop, but it's not good practice to use these in
     -- CPLDs, especially if they can be replaced with a synchronous alternative
 
-    -- process(nLoad, nRST)
-    -- begin
-    --     if (nRST = '0') then
-    --         seenRst <= '1';
-    --     elsif (nLoad = '0') then
-    --         seenRst <= '0';
-    --     end if;
-    -- end process;
-
     process(CLK16MHz)
     begin
+        -- Synchronise Phi0 going in to the state machine
         if falling_edge(CLK16MHz) then
-            if (nRST = '0') then
-                seenRst <= '1';
-            elsif (nLoad = '0') then
-                seenRst <= '0';
-            end if;
+            Phi0S <= Phi0;
         end if;
-    end process;
-
-    -- start the synchronization process on the first tube read cycle after a reset
-    nLoadIn <= '0' when seenRst = '1' and nSELA_int = '0' and RnW = '1' else '1';
-
-    -- actually synchronize to the next falling edge of Phi0
-    process(Phi0, nLoadDash)
-    begin
-        if (nLoadDash = '0') then
-            nLoad <= '1';
-        elsif falling_edge(Phi0) then
-            nLoad <= nLoadIn;
-        end if;
-    end process;
-
-    process(CLK16MHz)
-    begin
         if rising_edge(CLK16MHz) then
-            if (nLoad = '0') then
-                syncCount <= x"1";
-            else
-                syncCount <= syncCount + 1;
-            end if;
-            -- nLoadDash is just nLoad delayed by one 16MHz cycle
-            nLoadDash <= nLoad;
+            -- default action is to increment the counter
+            syncCount <= syncCount + 1;
+            -- state machine has four gray-coded states
+            case state is
+            -- idle state: wait for nRST to go low
+            when "00" =>
+                if nRST = '0' then
+                    state <= "01";
+                end if;
+            -- reset state: wait for nRST to go high
+            when "01" =>
+                if nRST = '1' then
+                    state <= "11";
+                end if;
+            -- primed state: wait for a read of the tube to start
+            when "11" =>
+                if nRST = '0' then
+                    state <= "01";
+                elsif nSELA_int = '0' and RnW = '1' and Phi0S = '1' then
+                    state <= "10";
+                end if;
+            -- loading state: wait for Phi to go low, and then load the counter
+            when "10" =>
+                if Phi0S = '0' then
+                    syncCount <= x"1";
+                    state <= "00";
+                end if;
+            when others =>
+                state <= "00";
+            end case;
         end if;
     end process;
 
@@ -235,7 +227,7 @@ begin
             end if;
             if A(7 downto 0) = x"DB" and nPFC = '0' and RnW = '0' then
                 CEN <= '0';
-            end if;            
+            end if;
         end if;
     end process;
 
