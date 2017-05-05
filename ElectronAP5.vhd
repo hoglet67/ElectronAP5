@@ -6,7 +6,7 @@
 -- Project Name:        Electron AP5
 -- Target Devices:      XC9572
 --
--- Version:             0.52
+-- Version:             0.53
 --
 ----------------------------------------------------------------------------------
 library ieee;
@@ -57,7 +57,7 @@ end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"52";
+constant VERSION : std_logic_vector(7 downto 0) := x"53";
 
 signal BnPFC_int : std_logic;
 signal BnPFD_int : std_logic;
@@ -323,10 +323,11 @@ begin
     -- 1MHZ Bus
     -- =============================================
 
-    -- BnPFC decodes addresses &FC2x, &FC3x, &FC8x, &FCAx, &FCFx
+    -- BnPFC decodes addresses &FC2x, &FC3x, &FC4x, &FC8x, &FCAx, &FCFx
     BnPFC_int <= '0' when nPFC = '0' and (
         A(7 downto 4) = x"2" or
         A(7 downto 4) = x"3" or
+        A(7 downto 4) = x"4" or
         A(7 downto 4) = x"8" or
         A(7 downto 4) = x"A" or
         A(7 downto 4) = x"F") else '1';
