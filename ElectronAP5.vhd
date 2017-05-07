@@ -6,7 +6,7 @@
 -- Project Name:        Electron AP5
 -- Target Devices:      XC9572
 --
--- Version:             0.53
+-- Version:             0.54
 --
 ----------------------------------------------------------------------------------
 library ieee;
@@ -57,7 +57,7 @@ end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"53";
+constant VERSION : std_logic_vector(7 downto 0) := x"54";
 
 signal BnPFC_int : std_logic;
 signal BnPFD_int : std_logic;
@@ -312,7 +312,7 @@ begin
     -- =============================================
 
     -- nSELA decodes address &FCEx
-    nSELA_int <= '0' when nPFC = '0' and A(7 downto 4) = x"E" else '1';
+    nSELA_int <= '0' when nPFC = '0' and A(7 downto 4) = x"E" and Phi0 = '1' else '1';
     nSELA <= nSELA_int;
 
     -- DIRA is direction input to 74LS245A, A side to Tube, B side to Elk)
@@ -338,7 +338,7 @@ begin
     BnPFD <= BnPFD_int;
 
     -- nSELB is the enable input to LS245A, asserted for any of the above addresses
-    nSELB <= '0' when BnPFC_int = '0' or BnPFD_int = '0' else '1';
+    nSELB <= '0' when (BnPFC_int = '0' or BnPFD_int = '0') and Phi0 = '1' else '1';
 
     -- BnRW is the direction input to 74LS245A, A side to Elk, B side to 1MHz Bus
     -- 0: B->A; 1: A->B
