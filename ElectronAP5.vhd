@@ -6,7 +6,7 @@
 -- Project Name:        Electron AP5
 -- Target Devices:      XC9572
 --
--- Version:             0.54
+-- Version:             0.55
 --
 ----------------------------------------------------------------------------------
 library ieee;
@@ -57,7 +57,7 @@ end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"54";
+constant VERSION : std_logic_vector(7 downto 0) := x"55";
 
 signal BnPFC_int : std_logic;
 signal BnPFD_int : std_logic;
@@ -165,7 +165,7 @@ begin
         if (nRST = '0') then
             NMID <= '0';
         elsif falling_edge(Phi0) then
-            NMID <= nNMI1MHz;
+            NMID <= not nNMI1MHz;
         end if;
     end process;
 
@@ -315,9 +315,9 @@ begin
     nSELA_int <= '0' when nPFC = '0' and A(7 downto 4) = x"E" and Phi0 = '1' else '1';
     nSELA <= nSELA_int;
 
-    -- DIRA is direction input to 74LS245A, A side to Tube, B side to Elk)
+    -- DIRA is direction input to 74LS245A, A side to Tube, B side to Elk
     -- 0: B->A; 1: A->B
-    DIRA  <= '1' when nSELA_int = '0' and RnW = '1' else '0';
+    DIRA  <= RnW;
 
     -- =============================================
     -- 1MHZ Bus
