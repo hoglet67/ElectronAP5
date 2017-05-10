@@ -6,7 +6,7 @@
 -- Project Name:        Electron AP5
 -- Target Devices:      XC9572
 --
--- Version:             0.55
+-- Version:             0.56
 --
 ----------------------------------------------------------------------------------
 library ieee;
@@ -57,7 +57,7 @@ end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"55";
+constant VERSION : std_logic_vector(7 downto 0) := x"56";
 
 signal BnPFC_int : std_logic;
 signal BnPFD_int : std_logic;
@@ -312,7 +312,7 @@ begin
     -- =============================================
 
     -- nSELA decodes address &FCEx
-    nSELA_int <= '0' when nPFC = '0' and A(7 downto 4) = x"E" and Phi0 = '1' else '1';
+    nSELA_int <= '0' when nPFC = '0' and A(7 downto 4) = x"E" else '1';
     nSELA <= nSELA_int;
 
     -- DIRA is direction input to 74LS245A, A side to Tube, B side to Elk
