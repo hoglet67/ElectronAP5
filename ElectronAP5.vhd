@@ -6,7 +6,7 @@
 -- Project Name:        Electron AP5
 -- Target Devices:      XC9572
 --
--- Version:             0.56
+-- Version:             0.57
 --
 ----------------------------------------------------------------------------------
 library ieee;
@@ -43,7 +43,7 @@ entity ElectronAP5 is
         nCE1:     out   std_logic;
         nCE2:     out   std_logic;
         nFCBx:    out   std_logic;
-        NMID:     out   std_logic;
+        nNMI:     out   std_logic;
         nOE13:    out   std_logic;
         nOE1:     out   std_logic;
         nOE2:     out   std_logic;
@@ -57,7 +57,7 @@ end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"56";
+constant VERSION : std_logic_vector(7 downto 0) := x"57";
 
 signal BnPFC_int : std_logic;
 signal BnPFD_int : std_logic;
@@ -72,6 +72,8 @@ signal BEN       : std_logic := '0';
 signal CEN       : std_logic := '0';
 
 signal test      : std_logic_vector(7 downto 0);
+
+signal NMID      : std_logic := '0';
 
 begin
 
@@ -157,8 +159,6 @@ begin
     -- =============================================
     --
     -- Synchronize NMI from the 1MHz bus with Phi0
-    --
-    -- NMID drives a transistor; high will assert NMI
 
     process(Phi0, nRST)
     begin
@@ -169,6 +169,9 @@ begin
         end if;
     end process;
 
+    -- nNMI needs to be an open collector output
+    nNMI <= '0' when NMID = '1' else 'Z';
+    
     -- =============================================
     -- ROMs
     -- =============================================
