@@ -6,7 +6,7 @@
 -- Project Name:        Electron AP5
 -- Target Devices:      XC9572
 --
--- Version:             0.57
+-- Version:             0.58
 --
 ----------------------------------------------------------------------------------
 library ieee;
@@ -29,7 +29,6 @@ entity ElectronAP5 is
         Phi0:     in    std_logic;
         QA:       in    std_logic;
         R13256KS: in    std_logic;
-        R13D:     in    std_logic;
         RnW:      in    std_logic;
         A14:      out   std_logic;
         B1MHz:    out   std_logic;
@@ -51,13 +50,14 @@ entity ElectronAP5 is
         S2RnW:    out   std_logic;
         nSELA:    out   std_logic;
         nSELB:    out   std_logic;
+        nSELT:    out   std_logic;
         D:        inout std_logic_vector(7 downto 0)
     );
 end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"57";
+constant VERSION : std_logic_vector(7 downto 0) := x"58";
 
 signal BnPFC_int : std_logic;
 signal BnPFD_int : std_logic;
@@ -237,8 +237,8 @@ begin
     -- BnRW13 drives nWE of ROM13, and is a gated version of RnW
     BRnW13 <= '0' when RnW = '0' and CEN = '1' and Phi0 = '1' else '1';
 
-    -- nCE13 drives nCE of ROM13, jumper on R13D disables this ROM
-    nCE13 <= nROM13 when R13D = '1' else '1';
+    -- nCE13 drives nCE of ROM13
+    nCE13 <= nROM13;
 
     -- nOE13 drives nOE of ROM13, disable during writes
     nOE13 <= not RnW;
@@ -314,8 +314,12 @@ begin
     -- Tube
     -- =============================================
 
-    -- nSELA decodes address &FCEx
-    nSELA_int <= '0' when nPFC = '0' and A(7 downto 4) = x"E" else '1';
+    -- nSELT decodes address &FCEx and becomes nTUBE (pin 8) on the tube connector
+    nSELT <= '0' when nPFC = '0' and A(7 downto 4) = x"E" else '1';
+    
+    -- nSELA decodes address &FCEx and enables the 74LS245
+    -- Gating with Phi0 reduces the possibility of any bus contention
+    nSELA_int <= '0' when nPFC = '0' and A(7 downto 4) = x"E" and Phi0 = '1' else '1';
     nSELA <= nSELA_int;
 
     -- DIRA is direction input to 74LS245A, A side to Tube, B side to Elk
