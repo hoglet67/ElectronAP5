@@ -6,7 +6,7 @@
 -- Project Name:        Electron AP5
 -- Target Devices:      XC9572
 --
--- Version:             0.59
+-- Version:             0.5A
 --
 ----------------------------------------------------------------------------------
 library ieee;
@@ -57,7 +57,7 @@ end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"59";
+constant VERSION : std_logic_vector(7 downto 0) := x"5A";
 
 signal BnPFC_int : std_logic;
 signal BnPFD_int : std_logic;
@@ -283,9 +283,9 @@ begin
     -- S2Rnw drives nWE of ROM 1/3
     S2Rnw <=
         -- in normal mode, lock based on AEN or BEN depending on the ROM size and bank
-        '0' when MMCM = '1' and RnW = '0' and ((QA = '0' and R13256KS = '0' and AEN = '1') or BEN = '1') and Phi0 = '1' else
+        '0' when MMCM = '1' and RnW = '0' and ((QA = '0' and R13256KS = '0' and AEN = '1') or (QA = '1' and BEN = '1')) and Phi0 = '1' else
         -- in MMC mode, ignore the 256K jumper as the ROM 1/3 must be 32K
-        '0' when MMCM = '0' and RnW = '0' and ((QA = '0'                    and AEN = '1') or BEN = '1') and Phi0 = '1' else
+        '0' when MMCM = '0' and RnW = '0' and ((QA = '0'                    and AEN = '1') or (QA = '1' and BEN = '1')) and Phi0 = '1' else
         -- default to no write
         '1';
 
