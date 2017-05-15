@@ -6,7 +6,7 @@
 -- Project Name:        Electron AP5
 -- Target Devices:      XC9572
 --
--- Version:             0.5A
+-- Version:             0.5B
 --
 ----------------------------------------------------------------------------------
 library ieee;
@@ -57,7 +57,7 @@ end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"5A";
+constant VERSION : std_logic_vector(7 downto 0) := x"5B";
 
 signal BnPFC_int : std_logic;
 signal BnPFD_int : std_logic;
@@ -75,6 +75,10 @@ signal test      : std_logic_vector(7 downto 0);
 
 signal NMID      : std_logic := '0';
 
+signal bank     : std_logic_vector(1 downto 0);
+
+signal mode     : std_logic_vector(1 downto 0);
+
 begin
 
     -- =============================================
@@ -84,12 +88,12 @@ begin
     -- Initialized on reset to 0x51 (the version number)
     -- Read/Write at &FCD7
 
-    process(Phi0)
+    process(Phi0, nRST)
     begin
-        if falling_edge(Phi0) then
-            if (nRST = '0') then
-                test <= VERSION;
-            elsif nPFC = '0' and RnW = '0' and A(7 downto 0) = x"D7" then
+        if nRST = '0' then
+            test <= VERSION;
+        elsif falling_edge(Phi0) then
+            if nPFC = '0' and RnW = '0' and A(7 downto 0) = x"D7" then
                 test <= D;
             end if;
         end if;
@@ -171,7 +175,7 @@ begin
 
     -- nNMI needs to be an open collector output
     nNMI <= '0' when NMID = '1' else 'Z';
-    
+
     -- =============================================
     -- ROMs
     -- =============================================
@@ -243,72 +247,169 @@ begin
     -- nOE13 drives nOE of ROM13, disable during writes
     nOE13 <= not RnW;
 
-    -- Summary of how ROM mapping is implemented
+    -- Summary of the different ROM modes
     --
-    -- Note: The R13256KS and MMCM jumpers are effectively active low
-    -- i.e. 0 = jumper fitted, 1 = jumper missing
+    -- Note: addresses refer to the address within the device
     --
-    -- Mode:            Inputs:                          Outputs:
-    --                  Mode jumpers:   Address:  ROM:   nCE to   nCE to
-    --                  R13256KS MMCM   A(13:0)   QA     ROM 0/2  ROM 1/3  A14
-    -- normal/16K       1        1      *         0      0        1        1
-    --                  1        1      *         1      1        0        1
-    -- normal/32K       0        1      *         0      1        0        0
-    --                  0        1      *         1      1        0        1
-    -- MMC mode/32K     *        0      *         0      1        0        0
-    --                  *        0      <  &3600  1      1        0        1
-    --                  *        0      >= &3600  1      0        1        1
+    -- MMFS mode has a 2.5KB RAM overlay at the end of slot 0/2
+    -- ADFS mode has a 4KB RAM overlay at the and of slot 1/3
+    --
+    --
+    -- Jumpers:                      ROM socket 0:      ROM Socket 1:
+    --
+    -- 11 - normal/16KB    Device:   128Kb ROM/RAM      128Kb ROM/RAM
+    --                     Slot 0:   0000-3FFF
+    --                     Slot 1:                      0000-3FFF
+    --
+    -- 10 - normal/32KB    Device:   empty              256Kb ROM/RAM
+    --                     Slot 0:                      0000-3FFF
+    --                     Slot 1:                      4000-7FFF
+    --
+    -- 01 - MMFS/32KB      Device:   128Kb RAM          256Kb ROM
+    --                     Slot 0:                      0000-3FFF
+    --                     Slot 1:   3600-3FFF          4000-75FF
+    --
+    -- 00 - ADFS/64KB      Device:   128Kb RAM          512Kb ROM
+    --                     Slot 0:                      C000-FFFF
+    --                     Slot 1 A: 3000-3FFF          0000-2FFF (bank 0)
+    --                     Slot 1 B: 3000-3FFF          4000-6FFF (bank 1)
+    --                     Slot 1 C: 3000-3FFF          8000-AFFF (bank 2)
+    --
 
-    -- S1RnW drives nWR of ROM 0/2
-    S1RnW <=
-        -- in normal mode, suport locking with AEN and gate with Phi2
-        '0' when MMCM = '1' and RnW = '0' and AEN ='1' and Phi0 = '1' else
-        -- in MMC mode, the RAM is not lockable as it's used for workspace
-        '0' when MMCM = '0' and RnW = '0'              and Phi0 = '1' else
-        -- default to no write
-        '1';
+    -- For mode from the two existing jumpers
+    mode <= MMCM & R13256KS;
+    
+    process(mode, QA, RnW, AEN, BEN, Phi0, nROE, A, bank)
+    begin
+
+        -- Default values for all outputs, so we don't accidentally infer a latch
+        S1RnW <= '1';
+        nCE1  <= '1';
+        S2RnW <= '1';
+        nCE2  <= '1';
+        A14   <= '1'; -- this defaults to '1' as it is nPGM on a 27128
+
+        -- Everything is conditional on nROE being active
+        if nROE = '0' then
+
+            -- To make this manageable and easily extensible, we use a big case
+            -- statement with case per mode, controlling which device gets selected
+            -- and whether RnW is enabled. Each case then starts by looking at
+            -- QA. Although not the most compact way to represent the logic, is
+            -- is probably the most readable.
+
+            case mode is
+                when "11" =>
+                    -- Normal/16KB Mode
+                    if QA = '0' then
+                        -- Slot 0/2
+                        nCE1 <= '0';
+                        if RnW = '0' and Phi0 = '1' and AEN = '1' then
+                            S1RnW <= '0';
+                        end if;
+                    else
+                        -- Slot 1/3
+                        nCE2 <= '0';
+                        if RnW = '0' and Phi0 = '1' and BEN = '1' then
+                            S2RnW <= '0';
+                        end if;
+                    end if;
+
+                when "10" =>
+                    -- Normal/32KB Mode
+                    if QA = '0' then
+                        -- Slot 0/2
+                        nCE2 <= '0';
+                        A14  <= '0';
+                        if RnW = '0' and Phi0 = '1' and AEN = '1' then
+                            S2RnW <= '0';
+                        end if;
+                    else
+                        -- Slot 1/3
+                        nCE2 <= '0';
+                        A14  <= '1';
+                        if RnW = '0' and Phi0 = '1' and BEN = '1' then
+                            S2RnW <= '0';
+                        end if;
+                    end if;
+
+                when "01" =>
+                    -- MMFS Mode
+                    if QA = '0' then
+                        -- Slot 0/2
+                        nCE2 <= '0';
+                        A14  <= '0';
+                        if RnW = '0' and Phi0 = '1' and AEN = '1' then
+                            S2RnW <= '0';
+                        end if;
+                    else
+                        -- Slot 1/3
+                        if A(13 downto 8) >= "110110" then
+                            -- Select RAM if address >= &B600
+                            nCE1 <= '0';
+                            -- RAM WE is not conditional on the lock flags
+                            if RnW = '0' and Phi0 = '1' then
+                                S1RnW <= '0';
+                            end if;
+                        else
+                            -- Otherwise, select ROM
+                            nCE2 <= '0';
+                            A14  <= '1';
+                            if RnW = '0' and Phi0 = '1' and BEN = '1' then
+                                S2RnW <= '0';
+                            end if;
+                        end if;
+                    end if;
+
+                when "00" =>
+                    -- ADFS Mode
+                    if QA = '0' then
+                        -- Slot 0/2
+                        nCE2  <= '0';
+                        A14   <= '1'; -- this is actually A15 into the 27512
+                        S2RnW <= '1'; -- this is actually A14 into the 27512
+                    else
+                        -- Slot 1/3
+                        if A(13 downto 12) = "11" then
+                            -- Select RAM if address >= &B000
+                            nCE1 <= '0';
+                            -- RAM WE is not conditional on the lock flags
+                            if RnW = '0' and Phi0 = '1' then
+                                S1RnW <= '0';
+                            end if;
+                        else
+                            -- Otherwise, select ROM from approriate bank
+                            nCE2  <= '0';
+                            A14   <= bank(1); -- this is actually A15 into the 27512
+                            S2RnW <= bank(0); -- this is actually A14 into the 27512
+                        end if;
+                    end if;
+
+                when others =>
+                    -- for undefined modes, use defaults set before case
+            end case;
+        end if;
+    end process;
 
     -- nOE1 drives nOE of ROM 0/2, always disable during writes
     nOE1 <= not RnW;
 
-    -- nCE1 drives nCE of ROM 0/2
-    nCE1 <=
-        -- in normal mode, enable for even ROM only when the 256K jumper is not fitted
-        '0' when MMCM = '1' and nROE = '0' and (QA = '0' and R13256KS = '1') else
-        -- in MMC mode, enable for odd ROM accesses >= &B600
-        '0' when MMCM = '0' and nROE = '0' and (QA = '1' and A(13 downto 8) >= "110110") else
-        -- default to disabled
-        '1';
-
-    -- S2Rnw drives nWE of ROM 1/3
-    S2Rnw <=
-        -- in normal mode, lock based on AEN or BEN depending on the ROM size and bank
-        '0' when MMCM = '1' and RnW = '0' and ((QA = '0' and R13256KS = '0' and AEN = '1') or (QA = '1' and BEN = '1')) and Phi0 = '1' else
-        -- in MMC mode, ignore the 256K jumper as the ROM 1/3 must be 32K
-        '0' when MMCM = '0' and RnW = '0' and ((QA = '0'                    and AEN = '1') or (QA = '1' and BEN = '1')) and Phi0 = '1' else
-        -- default to no write
-        '1';
-
     -- nOE2 drives nOE of ROM 1/3, always disable during writes
     nOE2 <= not RnW;
 
-    -- nCE2 drives nCE of ROM 1/3
-    nCE2 <=
-        -- in normal mode, enable when 256K jumper is present, or for the odd ROM
-        '0' when MMCM = '1' and nROE = '0' and (QA = '1' or R13256KS = '0') else
-        -- in MMC mode, enable for the even ROM,
-        '0' when MMCM = '0' and nROE = '0' and (QA = '0' or A(13 downto 8) < "110110") else
-        -- default to disabled
-        '1';
-
-    -- A14 drives A14 input to ROM 1/3
-    A14 <=
-        -- in normal mode when 256K jumper is present, pass QA through as A14
-        QA when MMCM = '1' and R13256KS = '0' else
-        -- in MMC mode, ignore the 256K jumper as the ROM 1/3 must be 32K
-        QA when MMCM = '0'                    else
-        -- default to A14 = 1
-        '1';
+    -- Bank select registers
+    process(Phi0, nRST)
+    begin
+        if nRST = '0' then
+            -- default to bank 0 on reset
+            bank <= "00";
+        elsif falling_edge(Phi0) then
+            -- detect write to &AFFF but only when slot 1/3 paged in
+            if nROE = '0' and QA = '1' and A(13 downto 12) = "10" and A(11 downto 0) = x"FFF" then
+                bank <= D(1 downto 0);
+            end if;
+        end if;
+    end process;
 
     -- =============================================
     -- Tube
@@ -316,7 +417,7 @@ begin
 
     -- nSELT decodes address &FCEx and becomes nTUBE (pin 8) on the tube connector
     nSELT <= '0' when nPFC = '0' and A(7 downto 4) = x"E" else '1';
-    
+
     -- nSELA decodes address &FCEx and enables the 74LS245
     -- Gating with Phi0 reduces the possibility of any bus contention
     nSELA_int <= '0' when nPFC = '0' and A(7 downto 4) = x"E" and Phi0 = '1' else '1';
