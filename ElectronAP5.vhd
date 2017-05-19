@@ -6,7 +6,7 @@
 -- Project Name:        Electron AP5
 -- Target Devices:      XC9572
 --
--- Version:             0.5C
+-- Version:             0.5D
 --
 ----------------------------------------------------------------------------------
 library ieee;
@@ -57,7 +57,16 @@ end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"5C";
+constant VERSION : std_logic_vector(7 downto 0) := x"5D";
+
+-- Address that must be written to update the banksel register
+constant BANKSEL_ADDR : std_logic_vector(15 downto 0) := x"AFFF";
+
+-- Data that must be written to update the banksel register (D0 = banksel bit)
+constant BANKSEL_DATA : std_logic_vector( 7 downto 0) := x"96";
+
+-- Number of consequtive writes required: "10" would be
+constant BANKSEL_COUNT : unsigned (1 downto 0)        := "10";
 
 signal BnPFC_int : std_logic;
 signal BnPFD_int : std_logic;
@@ -74,6 +83,8 @@ signal CEN       : std_logic := '0';
 signal test      : std_logic_vector(7 downto 0);
 
 signal NMID      : std_logic := '0';
+
+signal bankCount : unsigned(1 downto 0) := "00";
 
 signal bank      : std_logic_vector(1 downto 0) := "00";
 
@@ -257,33 +268,38 @@ begin
     -- Note: addresses refer to the address within the device
     --
     -- MMFS mode has a 2.5KB RAM overlay at the end of slot 0/2
-    -- ADFS mode has a 4KB RAM overlay at the and of slot 1/3
+    -- ADFS mode has a 4KB RAM overlay at the and of slot 0/2
     --
     --
     -- Jumpers:                      ROM socket 0:      ROM Socket 1:
     --
-    -- 11 - normal/16KB    Device:   128Kb ROM/RAM      128Kb ROM/RAM
-    --                     Slot 0:   0000-3FFF
-    --                     Slot 1:                      0000-3FFF
+    -- 11 - normal/32KB    Device:   256Kb ROM/RAM      256Kb ROM/RAM
+    --                     Slot 0 A: 0000-3FFF                    (bank 0)
+    --                     Slot 0 B: 4000-7FFF                    (bank 1)
+    --                     Slot 1 A:                    0000-3FFF (bank 0)
+    --                     Slot 1 B:                    4000-7FFF (bank 1)
     --
-    -- 10 - normal/32KB    Device:   empty              256Kb ROM/RAM
-    --                     Slot 0:                      0000-3FFF
-    --                     Slot 1:                      4000-7FFF
+    -- 10 - normal/64KB    Device:   empty              512Kb ROM
+    --                     Slot 0 A:                    0000-3FFF (bank 0)
+    --                     Slot 0 B:                    8000-BFFF (bank 1)
+    --                     Slot 1 A:                    4000-7FFF (bank 0)
+    --                     Slot 1 B:                    C000-FFFF (bank 1)
     --
-    -- 01 - MMFS/32KB      Device:   128Kb RAM          256Kb ROM
-    --                     Slot 0:                      0000-3FFF
-    --                     Slot 1:   3600-3FFF          4000-75FF
+    -- 01 - MMFS/32-64KB   Device:   128Kb RAM          512Kb ROM
+    --                     Slot 0 A: 3600-3FFF          0000-35FF (bank 0)
+    --                     Slot 0 B: 3600-3FFF          4000-75FF (bank 1)
+    --                     Slot 1 A:                    8000-BFFF (bank 0)
+    --                     Slot 1 B:                    C000-FFFF (bank 1)
     --
-    -- 00 - ADFS/64KB      Device:   128Kb RAM          512Kb ROM
-    --                     Slot 0:                      C000-FFFF
-    --                     Slot 1 A: 3000-3FFF          0000-2FFF (bank 0)
-    --                     Slot 1 B: 3000-3FFF          4000-6FFF (bank 1)
-    --                     Slot 1 C: 3000-3FFF          8000-AFFF (bank 2)
-    --
+    -- 00 - ADFS/32-64KB   Device:   128Kb RAM          512Kb ROM
+    --                     Slot 0 A: 3000-3FFF          0000-2FFF (bank 0)
+    --                     Slot 0 B: 3000-3FFF          4000-6FFF (bank 1)
+    --                     Slot 1 A:                    8000-BFFF (bank 0)
+    --                     Slot 1 B:                    C000-FFFF (bank 1)
 
     -- For mode from the two existing jumpers
     mode <= MMCM & R13256KS;
-    
+
     process(mode, QA, RnW, AEN, BEN, Phi0, nROE, A, bank)
     begin
 
@@ -305,50 +321,56 @@ begin
 
             case mode is
                 when "11" =>
-                    -- Normal/16KB Mode
+                    -- Normal/32KB Mode
+                    -- 11 - normal/32KB    Device:   256Kb ROM/RAM      256Kb ROM/RAM
+                    --                     Slot 0 A: 0000-3FFF                    (bank 0)
+                    --                     Slot 0 B: 4000-7FFF                    (bank 1)
+                    --                     Slot 1 A:                    0000-3FFF (bank 0)
+                    --                     Slot 1 B:                    4000-7FFF (bank 1)
                     if QA = '0' then
                         -- Slot 0/2
                         nCE1 <= '0';
                         if RnW = '0' and Phi0 = '1' and AEN = '1' then
                             S1RnW <= '0';
                         end if;
+                        A14  <= bank(0);
                     else
                         -- Slot 1/3
                         nCE2 <= '0';
                         if RnW = '0' and Phi0 = '1' and BEN = '1' then
                             S2RnW <= '0';
                         end if;
+                        A14  <= bank(1);
                     end if;
 
                 when "10" =>
-                    -- Normal/32KB Mode
+                    -- Normal/64KB Mode
+                    -- 10 - normal/64KB    Device:   empty              512Kb ROM
+                    --                     Slot 0 A:                    0000-3FFF (bank 0)
+                    --                     Slot 0 B:                    8000-BFFF (bank 1)
+                    --                     Slot 1 A:                    4000-7FFF (bank 0)
+                    --                     Slot 1 B:                    C000-FFFF (bank 1)
                     if QA = '0' then
                         -- Slot 0/2
                         nCE2 <= '0';
-                        A14  <= '0';
-                        if RnW = '0' and Phi0 = '1' and AEN = '1' then
-                            S2RnW <= '0';
-                        end if;
+                        A14   <= '0';     -- this is actually A15 into the 27512
+                        S2RnW <= bank(0); -- this is actually A14 into the 27512
                     else
                         -- Slot 1/3
                         nCE2 <= '0';
-                        A14  <= '1';
-                        if RnW = '0' and Phi0 = '1' and BEN = '1' then
-                            S2RnW <= '0';
-                        end if;
+                        A14   <= '1';     -- this is actually A15 into the 27512
+                        S2RnW <= bank(1); -- this is actually A14 into the 27512
                     end if;
 
                 when "01" =>
-                    -- MMFS Mode
+                    -- MMFS/32-64KB Mode
+                    -- 01 - MMFS/32-64KB   Device:   128Kb RAM          512Kb ROM
+                    --                     Slot 0 A: 3600-3FFF          0000-35FF (bank 0)
+                    --                     Slot 0 B: 3600-3FFF          4000-75FF (bank 1)
+                    --                     Slot 1 A:                    8000-BFFF (bank 0)
+                    --                     Slot 1 B:                    C000-FFFF (bank 1)
                     if QA = '0' then
                         -- Slot 0/2
-                        nCE2 <= '0';
-                        A14  <= '0';
-                        if RnW = '0' and Phi0 = '1' and AEN = '1' then
-                            S2RnW <= '0';
-                        end if;
-                    else
-                        -- Slot 1/3
                         if A(13 downto 8) >= "110110" then
                             -- Select RAM if address >= &B600
                             nCE1 <= '0';
@@ -356,25 +378,29 @@ begin
                             if RnW = '0' and Phi0 = '1' then
                                 S1RnW <= '0';
                             end if;
+                            -- A14 doesn't really matter, defaults to '1'
                         else
-                            -- Otherwise, select ROM
-                            nCE2 <= '0';
-                            A14  <= '1';
-                            if RnW = '0' and Phi0 = '1' and BEN = '1' then
-                                S2RnW <= '0';
-                            end if;
+                            -- Otherwise, select ROM from approriate bank
+                            nCE2  <= '0';
+                            A14   <= '0';     -- this is actually A15 into the 27512
+                            S2RnW <= bank(0); -- this is actually A14 into the 27512
                         end if;
+                    else
+                        -- Slot 1/3
+                        nCE2  <= '0';
+                        A14   <= '1';         -- this is actually A15 into the 27512
+                        S2RnW <= bank(1);     -- this is actually A14 into the 27512
                     end if;
 
                 when "00" =>
-                    -- ADFS Mode
+                    -- ADFS/32-64KB Mode
+                    -- 00 - ADFS/32-64KB   Device:   128Kb RAM          512Kb ROM
+                    --                     Slot 0 A: 3000-3FFF          0000-2FFF (bank 0)
+                    --                     Slot 0 B: 3000-3FFF          4000-6FFF (bank 1)
+                    --                     Slot 1 A:                    8000-BFFF (bank 0)
+                    --                     Slot 1 B:                    C000-FFFF (bank 1)
                     if QA = '0' then
                         -- Slot 0/2
-                        nCE2  <= '0';
-                        A14   <= '1'; -- this is actually A15 into the 27512
-                        S2RnW <= '1'; -- this is actually A14 into the 27512
-                    else
-                        -- Slot 1/3
                         if A(13 downto 12) = "11" then
                             -- Select RAM if address >= &B000
                             nCE1 <= '0';
@@ -382,12 +408,18 @@ begin
                             if RnW = '0' and Phi0 = '1' then
                                 S1RnW <= '0';
                             end if;
+                            -- A14 doesn't really matter, defaults to '1'
                         else
                             -- Otherwise, select ROM from approriate bank
                             nCE2  <= '0';
-                            A14   <= bank(1); -- this is actually A15 into the 27512
+                            A14   <= '0';     -- this is actually A15 into the 27512
                             S2RnW <= bank(0); -- this is actually A14 into the 27512
                         end if;
+                    else
+                        -- Slot 1/3
+                        nCE2  <= '0';
+                        A14   <= '1';         -- this is actually A15 into the 27512
+                        S2RnW <= bank(1);     -- this is actually A14 into the 27512
                     end if;
 
                 when others =>
@@ -407,11 +439,30 @@ begin
     begin
         if nRST = '0' then
             -- default to bank 0 on reset
-            bank <= "00";
+            bank <= (others => '0');
         elsif falling_edge(Phi0) then
-            -- detect write to &AFFF but only when slot 1/3 paged in
-            if nROE = '0' and RnW = '0' and QA = '1' and A(13 downto 12) = "10" and A(11 downto 0) = x"FFF" then
-                bank <= D(1 downto 0);
+            -- detect writes
+            if RnW = '0' then
+                -- detect write to &AFFF
+                if nROE = '0' and A(13 downto 0) = BANKSEL_ADDR(13 downto 0) and D(7 downto 1) = BANKSEL_DATA(7 downto 1) then
+                    -- if this is the third write, then update the bank register
+                    if bankCount = BANKSEL_COUNT then
+                        -- select the slot to update based on QA
+                        if QA = '0' then
+                            bank(0) <= D(0);
+                        else
+                            bank(1) <= D(0);
+                        end if;
+                        -- reset bankCount
+                        bankCount <= "00";
+                    else
+                        -- else increment bankCount
+                        bankCount <= bankCount + 1;
+                    end if;
+                else
+                    -- a write to somewhere else, so reset bankCount
+                    bankCount <= "00";
+                end if;
             end if;
         end if;
     end process;
