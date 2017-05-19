@@ -6,7 +6,7 @@
 -- Project Name:        Electron AP5
 -- Target Devices:      XC9572
 --
--- Version:             0.5B
+-- Version:             0.5C
 --
 ----------------------------------------------------------------------------------
 library ieee;
@@ -57,7 +57,7 @@ end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"5B";
+constant VERSION : std_logic_vector(7 downto 0) := x"5C";
 
 signal BnPFC_int : std_logic;
 signal BnPFD_int : std_logic;
@@ -75,9 +75,9 @@ signal test      : std_logic_vector(7 downto 0);
 
 signal NMID      : std_logic := '0';
 
-signal bank     : std_logic_vector(1 downto 0);
+signal bank      : std_logic_vector(1 downto 0) := "00";
 
-signal mode     : std_logic_vector(1 downto 0);
+signal mode      : std_logic_vector(1 downto 0);
 
 begin
 
@@ -180,17 +180,19 @@ begin
     -- ROMs
     -- =============================================
 
-    -- Software Write Enables for the two ROMs
-    --
-    -- In 16K Mode
+    -- Software Write Enables for the two ROMs:
     --   AEN enables write to ROM 0/2
     --   BEN enables write to ROM 1/3
     --   CEN enables write to ROM 13
-    -- In 32K Mode
-    --   AEN enables write to lower half of ROM 1/3
-    --   BEN enables write to upper half of ROM 1/3
-    --   CEN enables write to ROM 13
-    -- These registers should power up to locked (0)
+    --
+    -- During reset, to reduce the possibility of write glitches
+    --   AEN is locked
+    --   BEN is locked
+    --   CEN is locked
+    --
+    -- After reset:
+    --   If LKD02 is present (0), AEN is unlocked
+    --   If LKD03 is present (1), BEN is unlocked
     --
     -- Write to &FCDA - Unlock ROM 13
     -- Write to &FCDB - Lock ROM 13
@@ -198,12 +200,15 @@ begin
     -- Write to &FCDD - Lock ROM 0/2
     -- Write to &FCDE - Unlock ROM 1/3
     -- Write to &FCDF - Lock ROM 1/3
-    --
-    -- If the lock disable (LKD) jumper is present (LKD = 0), then
-    -- then disable the software lockking
-    process(Phi0)
+
+    process(Phi0, nRST)
     begin
-        if falling_edge(Phi0) then
+        if nRST = '0' then
+            -- default to locked during/on reset
+            AEN <= '0';
+            BEN <= '0';
+            CEN <= '0';
+        elsif falling_edge(Phi0) then
             if LKD02 = '0' then
                 -- lock disable jumper present
                 AEN <= '1';
@@ -405,7 +410,7 @@ begin
             bank <= "00";
         elsif falling_edge(Phi0) then
             -- detect write to &AFFF but only when slot 1/3 paged in
-            if nROE = '0' and QA = '1' and A(13 downto 12) = "10" and A(11 downto 0) = x"FFF" then
+            if nROE = '0' and RnW = '0' and QA = '1' and A(13 downto 12) = "10" and A(11 downto 0) = x"FFF" then
                 bank <= D(1 downto 0);
             end if;
         end if;
