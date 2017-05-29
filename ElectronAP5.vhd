@@ -6,7 +6,7 @@
 -- Project Name:        Electron AP5
 -- Target Devices:      XC9572
 --
--- Version:             0.5D
+-- Version:             0.5E
 --
 ----------------------------------------------------------------------------------
 library ieee;
@@ -46,6 +46,7 @@ entity ElectronAP5 is
         nOE13:    out   std_logic;
         nOE1:     out   std_logic;
         nOE2:     out   std_logic;
+        Phi2:     out   std_logic;
         S1RnW:    out   std_logic;
         S2RnW:    out   std_logic;
         nSELA:    out   std_logic;
@@ -57,7 +58,7 @@ end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"5D";
+constant VERSION : std_logic_vector(7 downto 0) := x"5E";
 
 -- Address that must be written to update the banksel register
 constant BANKSEL_ADDR : std_logic_vector(15 downto 0) := x"AFFF";
@@ -90,6 +91,8 @@ signal bank      : std_logic_vector(1 downto 0) := "00";
 
 signal mode      : std_logic_vector(1 downto 0);
 
+signal pstate    : std_logic_vector(2 downto 0) := "000";
+
 begin
 
     -- =============================================
@@ -113,6 +116,51 @@ begin
     -- Be conservative about bus conflicts by only driving when Phi0 is high
     D <= test when nPFC = '0' and RnW = '1' and A(7 downto 0) = x"D7" and Phi0 = '1' else
          "ZZZZZZZZ";
+
+    -- =============================================
+    -- Phi2 clock generation
+    -- =============================================
+
+    process(CLK16MHz)
+    begin
+        if falling_edge(CLK16MHz) then
+            case pstate is
+            -- initial state: wait for phi0 to go high
+            when "000" =>
+                if Phi0 = '1' then
+                    pstate <= "001";
+                end if;
+            -- gitch rejection state: wait for phi0 to stay high for another cycle
+            when "001" =>
+                if Phi0 = '1' then
+                    pstate <= "011";
+                else
+                    pstate <= "000";
+                end if;
+            -- primed state: wait for phi0 to go low
+            when "011" =>
+                if Phi0 = '0' then
+                    pstate <= "111";
+                end if;
+            -- triggered state 0 (output phi2 held low)
+            when "111" =>
+                pstate <= "110";
+            -- triggered state 1 (output phi2 held low)
+            when "110" =>
+                pstate <= "101";
+            -- triggered state 2 (output phi2 held low)
+            when "101" =>
+                pstate <= "100";
+            -- triggered state 3 (output phi2 held low)
+            when "100" =>
+                pstate <= "000";
+            when others =>
+                pstate <= "000";
+            end case;
+        end if;
+    end process;
+
+    Phi2 <= not pstate(2);
 
     -- =============================================
     -- 1MHz clock generation
