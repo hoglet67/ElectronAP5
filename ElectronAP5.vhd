@@ -6,7 +6,7 @@
 -- Project Name:        Electron AP5
 -- Target Devices:      XC9572
 --
--- Version:             0.5E
+-- Version:             0.5F
 --
 ----------------------------------------------------------------------------------
 library ieee;
@@ -58,7 +58,7 @@ end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"5E";
+constant VERSION : std_logic_vector(7 downto 0) := x"5F";
 
 -- Address that must be written to update the banksel register
 constant BANKSEL_ADDR : std_logic_vector(15 downto 0) := x"AFFF";
@@ -73,8 +73,6 @@ signal BnPFC_int : std_logic;
 signal BnPFD_int : std_logic;
 signal nSELA_int : std_logic;
 
-signal Phi0S     : std_logic;
-signal state     : std_logic_vector(1 downto 0);
 signal syncCount : unsigned(3 downto 0);
 
 signal AEN       : std_logic := '0';
@@ -91,7 +89,7 @@ signal bank      : std_logic_vector(1 downto 0) := "00";
 
 signal mode      : std_logic_vector(1 downto 0);
 
-signal pstate    : std_logic_vector(2 downto 0) := "000";
+signal pstate    : std_logic_vector(3 downto 0) := x"0";
 
 begin
 
@@ -118,99 +116,142 @@ begin
          "ZZZZZZZZ";
 
     -- =============================================
-    -- Phi2 clock generation
+    -- Phi2 and 1MHz clock re-generation
     -- =============================================
 
     process(CLK16MHz)
     begin
+        -- On the issue 4 Elk (once warmed up):
+        --     Phi0 falls 15.6ns after 16MHz falls and 17.2ns before 16MHz rises
+        --
+        -- On the issue 6 Elk (once warmed up):
+        --     Phi0 falls 32.4ns after 16MHz falls and 1.6ns before 16MHz rises
+        --
+        -- The difference is due to two additional 74LS08 gate delays on the
+        -- issue 6 Elk (U18).
+        --
+        -- These times do drift with temperature by ~5ns (i.e. when the machine
+        -- is cold, Phi0 is earlier). This is because the cooler the ULA is,
+        -- the lower the propagation delays will be.
+        --
+        -- The XC9572 parts Dave is using are 7C speed grade, and need a
+        -- setup time of 4.5ns.
+
+        -- Conclusion: sampling Phi0 on the falling edge of 16MHz should be
+        -- safe. Using the rising edge would be safe on the issue 4, but not
+        -- on the issue 6.
+
         if falling_edge(CLK16MHz) then
-            case pstate is
-            -- initial state: wait for phi0 to go high
-            when "000" =>
-                if Phi0 = '1' then
-                    pstate <= "001";
-                end if;
-            -- gitch rejection state: wait for phi0 to stay high for another cycle
-            when "001" =>
-                if Phi0 = '1' then
-                    pstate <= "011";
-                else
-                    pstate <= "000";
-                end if;
-            -- primed state: wait for phi0 to go low
-            when "011" =>
-                if Phi0 = '0' then
-                    pstate <= "111";
-                end if;
-            -- triggered state 0 (output phi2 held low)
-            when "111" =>
-                pstate <= "110";
-            -- triggered state 1 (output phi2 held low)
-            when "110" =>
-                pstate <= "101";
-            -- triggered state 2 (output phi2 held low)
-            when "101" =>
-                pstate <= "100";
-            -- triggered state 3 (output phi2 held low)
-            when "100" =>
-                pstate <= "000";
-            when others =>
-                pstate <= "000";
-            end case;
-        end if;
-    end process;
 
-    Phi2 <= not pstate(2);
-
-    -- =============================================
-    -- 1MHz clock generation
-    -- =============================================
-
-    -- Note, the signal names and polarities don't quite match the
-    -- schematic, as they have been ammended for clarity.
-
-    -- seenRst goes active when nRST is asserted
-    -- it stays active until nLoad loads the counter
-
-    -- The original design used an RS flip/flop, but it's not good practice to use these in
-    -- CPLDs, especially if they can be replaced with a synchronous alternative
-
-    process(CLK16MHz)
-    begin
-        -- Synchronise Phi0 going in to the state machine
-        if falling_edge(CLK16MHz) then
-            Phi0S <= Phi0;
-        end if;
-        if rising_edge(CLK16MHz) then
-            -- default action is to increment the counter
+            -- default action is to increment the 1MHz counter
             syncCount <= syncCount + 1;
-            -- state machine has four gray-coded states
-            case state is
-            -- idle state: wait for nRST to go low
-            when "00" =>
-                if nRST = '0' then
-                    state <= "01";
+
+            -- pstate tracks the phase of Phi0
+            --
+            -- There are three cases:
+            --
+            -- A normal 2MHz cycle: low for 250ns, high for 250ns (3/4 cycles)
+            -- --     +--+
+            --   |   /   |
+            --   +--+    +--
+            --
+            -- A type A extended cycle: low for 250ns, high for 750ns (11/12 cycles)
+            -- --+    +----------+
+            --   |   /           |
+            --   +--+            +--
+            --
+            -- A type B extended cycle: low for 250ns, high for 1250ns (19/20 cycles)
+            -- --+    +------------------+
+            --   |   /                   |
+            --   +--+                    +--
+            --
+            -- The variance in number of 16MHz cycles that Phi0 appears to be
+            -- high for is because the rising edge of Phi0 is very slow: 0-2V takes 44ns.
+            --
+
+            case pstate is
+
+            -- initial state: wait for phi0 to go high
+            when x"0" =>
+                if Phi0 = '1' then
+                    pstate <= x"1";
                 end if;
-            -- reset state: wait for nRST to go high
-            when "01" =>
-                if nRST = '1' then
-                    state <= "11";
+
+            -- gitch rejection state: wait for phi0 to stay high for another cycle
+            when x"1" =>
+                if Phi0 = '1' then
+                    pstate <= x"3";
+                else
+                    pstate <= x"0";
                 end if;
-            -- primed state: wait for a read of the tube to start
-            when "11" =>
-                if nRST = '0' then
-                    state <= "01";
-                elsif nSELA_int = '0' and RnW = '1' and Phi0S = '1' then
-                    state <= "10";
+
+            -- (there is no state x"2")
+            -- this is so the initial states are grey coded:
+            -- 0000 -> 0001 -> 0011
+
+            -- primed state 1: act on the next falling edge of Phi0
+            when x"3" =>
+                if Phi0 = '1' then
+                    pstate <= x"4";
+                else
+                    pstate <= x"8";
+                    Phi2 <= '0';
                 end if;
-            -- loading state: wait for Phi to go low, and then load the counter
-            when "10" =>
-                if Phi0S = '0' then
-                    syncCount <= x"1";
-                    state <= "00";
+
+            -- primed state 2: act on the next falling edge of Phi0
+            when x"4" =>
+                if Phi0 = '1' then
+                    pstate <= x"5";
+                else
+                    pstate <= x"8";
+                    Phi2 <= '0';
                 end if;
+
+            -- primed state 3: act on the next falling edge of Phi0
+            when x"5" =>
+                if Phi0 = '1' then
+                    pstate <= x"6";
+                else
+                    pstate <= x"8";
+                    Phi2 <= '0';
+                end if;
+
+            -- primed state 4: act on the next falling edge of Phi0
+            when x"6" =>
+                if Phi0 = '1' then
+                    pstate <= x"7";
+                else
+                    pstate <= x"8";
+                    Phi2 <= '0';
+                end if;
+
+            -- primed state 5: act on the next falling edge of Phi0
+            --
+            -- at this point, phi0 has been high for 6 cycles so this MUST
+            -- be a type A (12 cycles high) or type B (20 cycles high) extended cycle
+            -- At the end of this cycle, we resynchronise the 1MHz clock
+            when x"7" =>
+                if Phi0 = '0' then
+                    pstate <= x"8";
+                    Phi2 <= '0';
+                    syncCount <= x"0";
+                end if;
+
+            -- triggered state 0 (output phi2 held low)
+            when x"8" =>
+                pstate <= x"9";
+            -- triggered state 1 (output phi2 held low)
+            when x"9" =>
+                pstate <= x"A";
+            -- triggered state 2 (output phi2 held low)
+            when x"A" =>
+                pstate <= x"B";
+            -- triggered state 3 (output phi2 held low)
+            when x"B" =>
+                pstate <= x"0";
+                Phi2 <= '1';
             when others =>
-                state <= "00";
+                pstate <= x"0";
             end case;
         end if;
     end process;
