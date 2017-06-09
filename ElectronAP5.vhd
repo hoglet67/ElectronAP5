@@ -6,7 +6,7 @@
 -- Project Name:        Electron AP5
 -- Target Devices:      XC9572
 --
--- Version:             0.60
+-- Version:             0.90
 --
 ----------------------------------------------------------------------------------
 library ieee;
@@ -25,12 +25,14 @@ entity ElectronAP5 is
         nRST:     in    std_logic;
         LKD02:    in    std_logic;
         LKD13:    in    std_logic;
-        MMCM:     in    std_logic;
+        MJ1:      in    std_logic;
         Phi0:     in    std_logic;
         QA:       in    std_logic;
-        R13256KS: in    std_logic;
+        MJ0:      in    std_logic;
         RnW:      in    std_logic;
-        A14:      out   std_logic;
+        SPARE:    in    std_logic;
+        A14ROM13: out   std_logic;
+        A14ROMS:  out   std_logic;
         B1MHz:    out   std_logic;
         BnPFC:    out   std_logic;
         BnPFD:    out   std_logic;
@@ -46,20 +48,21 @@ entity ElectronAP5 is
         nOE13:    out   std_logic;
         nOE1:     out   std_logic;
         nOE2:     out   std_logic;
-        Phi2:     out   std_logic;
+        Phi0Out:  out   std_logic;
         S1RnW:    out   std_logic;
         S2RnW:    out   std_logic;
         nSELA:    out   std_logic;
         nSELB:    out   std_logic;
         nSELT:    out   std_logic;
         nRST1:    out   std_logic;
+        nRST2:    out   std_logic;
         D:        inout std_logic_vector(7 downto 0)
     );
 end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"60";
+constant VERSION : std_logic_vector(7 downto 0) := x"90";
 
 -- Address that must be written to update the banksel register
 constant BANKSEL_ADDR : std_logic_vector(15 downto 0) := x"AFFF";
@@ -117,7 +120,7 @@ begin
          "ZZZZZZZZ";
 
     -- =============================================
-    -- Phi2 and 1MHz clock re-generation
+    -- Phi0Out and 1MHz clock re-generation
     -- =============================================
 
     process(CLK16MHz)
@@ -196,7 +199,7 @@ begin
                     pstate <= x"4";
                 else
                     pstate <= x"8";
-                    Phi2 <= '0';
+                    Phi0Out <= '0';
                 end if;
 
             -- primed state 2: act on the next falling edge of Phi0
@@ -205,7 +208,7 @@ begin
                     pstate <= x"5";
                 else
                     pstate <= x"8";
-                    Phi2 <= '0';
+                    Phi0Out <= '0';
                 end if;
 
             -- primed state 3: act on the next falling edge of Phi0
@@ -214,7 +217,7 @@ begin
                     pstate <= x"6";
                 else
                     pstate <= x"8";
-                    Phi2 <= '0';
+                    Phi0Out <= '0';
                 end if;
 
             -- primed state 4: act on the next falling edge of Phi0
@@ -223,7 +226,7 @@ begin
                     pstate <= x"7";
                 else
                     pstate <= x"8";
-                    Phi2 <= '0';
+                    Phi0Out <= '0';
                 end if;
 
             -- primed state 5: act on the next falling edge of Phi0
@@ -234,7 +237,7 @@ begin
             when x"7" =>
                 if Phi0 = '0' then
                     pstate <= x"8";
-                    Phi2 <= '0';
+                    Phi0Out <= '0';
                     syncCount <= x"0";
                 end if;
 
@@ -250,7 +253,7 @@ begin
             -- triggered state 3 (output phi2 held low)
             when x"B" =>
                 pstate <= x"0";
-                Phi2 <= '1';
+                Phi0Out <= '1';
             when others =>
                 pstate <= x"0";
             end case;
@@ -353,6 +356,9 @@ begin
     -- nOE13 drives nOE of ROM13, disable during writes
     nOE13 <= not RnW;
 
+    -- A14ROM13 is fixed high
+    A14ROM13 <= '1';
+    
     -- Summary of the different ROM modes
     --
     -- Note: addresses refer to the address within the device
@@ -388,17 +394,17 @@ begin
     --                     Slot 1 B:                    (unmapped)  8000-BFFF (bank 1)
 
     -- For mode from the two existing jumpers
-    mode <= MMCM & R13256KS;
+    mode <= MJ1 & MJ0;
 
     process(mode, QA, RnW, AEN, BEN, Phi0, nROE, A, bank)
     begin
 
         -- Default values for all outputs, so we don't accidentally infer a latch
-        S1RnW <= '1';
-        nCE1  <= '1';
-        S2RnW <= '1';
-        nCE2  <= '1';
-        A14   <= '1'; -- this defaults to '1' as it is nPGM on a 27128
+        S1RnW   <= '1';
+        nCE1    <= '1';
+        S2RnW   <= '1';
+        nCE2    <= '1';
+        A14ROMS <= '1'; -- this defaults to '1' as it is nPGM on a 27128
 
         -- Everything is conditional on nROE being active
         if nROE = '0' then
@@ -423,14 +429,14 @@ begin
                         if RnW = '0' and Phi0 = '1' and AEN = '1' then
                             S1RnW <= '0';
                         end if;
-                        A14  <= bank(0);
+                        A14ROMS <= bank(0);
                     else
                         -- Slot 1/3
                         nCE2 <= '0';
                         if RnW = '0' and Phi0 = '1' and BEN = '1' then
                             S2RnW <= '0';
                         end if;
-                        A14  <= bank(1);
+                        A14ROMS <= bank(1);
                     end if;
 
                 when "10" =>
@@ -443,12 +449,12 @@ begin
                     if QA = '0' then
                         -- Slot 0/2
                         nCE2 <= '0';
-                        A14   <= '0';         -- this is actually A15 into the 27512
+                        A14ROMS <= '0';       -- this is actually A15 into the 27512
                         S2RnW <= not bank(0); -- this is actually A14 into the 27512
                     else
                         -- Slot 1/3
                         nCE2 <= '0';
-                        A14   <= '1';         -- this is actually A15 into the 27512
+                        A14ROMS <= '1';       -- this is actually A15 into the 27512
                         S2RnW <= not bank(1); -- this is actually A14 into the 27512
                     end if;
 
@@ -472,13 +478,13 @@ begin
                         else
                             -- Otherwise, select ROM from approriate bank
                             nCE2  <= '0';
-                            A14   <= '0';         -- this is actually A15 into the 27512
+                            A14ROMS <= '0';       -- this is actually A15 into the 27512
                             S2RnW <= not bank(0); -- this is actually A14 into the 27512
                         end if;
                     else
                         -- Slot 1/3
                         nCE2  <= '0';
-                        A14   <= '1';             -- this is actually A15 into the 27512
+                        A14ROMS <= '1';           -- this is actually A15 into the 27512
                         S2RnW <= not bank(1);     -- this is actually A14 into the 27512
                     end if;
 
@@ -501,14 +507,14 @@ begin
                             -- A14 doesn't really matter, defaults to '1'
                         else
                             -- Otherwise, select ROM from approriate bank
-                            nCE2  <= '0';
-                            A14   <= '0';         -- this is actually A15 into the 27512
+                            nCE2 <= '0';
+                            A14ROMS <= '0';       -- this is actually A15 into the 27512
                             S2RnW <= not bank(0); -- this is actually A14 into the 27512
                         end if;
                     else
                         -- Slot 1/3
-                        nCE2  <= '0';
-                        A14   <= '1';             -- this is actually A15 into the 27512
+                        nCE2 <= '0';
+                        A14ROMS <= '1';           -- this is actually A15 into the 27512
                         S2RnW <= not bank(1);     -- this is actually A14 into the 27512
                     end if;
 
@@ -615,6 +621,10 @@ begin
     -- Reset buffering
     -- =============================================
 
+    -- nRST needs to be an open collector output
     nRST1 <= '0' when nRST = '0' else 'Z';
+
+    -- nRST2 needs to be an open collector output    
+    nRST2 <= '0' when nRST = '0' else 'Z';
     
 end Behavorial;
