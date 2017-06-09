@@ -1,0 +1,832 @@
+ 
+cpldfit:  version P.20131013                        Xilinx Inc.
+                                  Fitter Report
+Design Name: ElectronAP5                         Date:  6- 9-2017,  6:19PM
+Device Used: XC9572-15-TQ100
+Fitting Status: Successful
+
+*************************  Mapped Resource Summary  **************************
+
+Macrocells     Product Terms    Function Block   Registers      Pins           
+Used/Tot       Used/Tot         Inps Used/Tot    Used/Tot       Used/Tot       
+49 /72  ( 68%) 141 /360  ( 39%) 132/144 ( 92%)   25 /72  ( 35%) 59 /72  ( 82%)
+
+** Function Block Resources **
+
+Function    Mcells      FB Inps     Signals     Pterms      IO          
+Block       Used/Tot    Used/Tot    Used        Used/Tot    Used/Tot    
+FB1          10/18       34/36       34          35/90      10/18
+FB2          13/18       32/36       32          35/90       9/18
+FB3          15/18       31/36       31          46/90       4/18
+FB4          11/18       35/36       35          25/90       8/18
+             -----       -----                   -----       -----     
+             49/72      132/144                 141/360     31/72 
+
+* - Resource is exhausted
+
+** Global Control Resources **
+
+The complement of 'CLK16MHz' mapped onto global clock net GCK2.
+The complement of 'Phi0' mapped onto global clock net GCK3.
+Global output enable net(s) unused.
+Global set/reset net(s) unused.
+
+** Pin Resources **
+
+Signal Type    Required     Mapped  |  Pin Type            Used    Total 
+------------------------------------|------------------------------------
+Input         :   26          26    |  I/O              :    53      66
+Output        :   23          23    |  GCK/IO           :     3       3
+Bidirectional :    8           8    |  GTS/IO           :     2       2
+GCK           :    2           2    |  GSR/IO           :     1       1
+GTS           :    0           0    |
+GSR           :    0           0    |
+                 ----        ----
+        Total     59          59
+
+** Power Data **
+
+There are 0 macrocells in high performance mode (MCHP).
+There are 49 macrocells in low power mode (MCLP).
+End of Mapped Resource Summary
+**************************  Errors and Warnings  ***************************
+
+WARNING:Cpld - Unable to retrieve the path to the iSE Project Repository. Will
+   use the default filename of 'ElectronAP5.ise'.
+*************************  Summary of Mapped Logic  ************************
+
+** 31 Outputs **
+
+Signal                         Total Total Loc     Pin  Pin     Pin     Pwr  Slew Reg Init
+Name                           Pts   Inps          No.  Type    Use     Mode Rate State
+D<7>                           4     14    FB1_1   16   I/O     I/O     LOW  SLOW RESET
+nCE1                           4     9     FB1_2   13   I/O     O       LOW  SLOW 
+D<6>                           4     14    FB1_3   18   I/O     I/O     LOW  SLOW RESET
+nCE2                           5     9     FB1_5   14   I/O     O       LOW  SLOW 
+D<5>                           4     14    FB1_7   25   I/O     I/O     LOW  SLOW RESET
+D<1>                           4     14    FB1_10  28   I/O     I/O     LOW  SLOW RESET
+nRST1                          1     1     FB1_13  36   I/O     O       LOW  SLOW 
+D<4>                           4     14    FB1_15  29   I/O     I/O     LOW  SLOW RESET
+D<2>                           4     14    FB1_17  30   I/O     I/O     LOW  SLOW RESET
+nCE13                          1     1     FB1_18  40   I/O     O       LOW  SLOW 
+BnRW                           1     1     FB2_1   87   I/O     O       LOW  SLOW 
+S1RnW                          4     12    FB2_2   94   I/O     O       LOW  SLOW 
+nOE13                          1     1     FB2_3   91   I/O     O       LOW  SLOW 
+A14                            7     11    FB2_4   93   I/O     O       LOW  SLOW 
+S2RnW                          10    14    FB2_5   95   I/O     O       LOW  SLOW 
+nFCBx                          1     5     FB2_6   96   I/O     O       LOW  SLOW 
+nOE1                           1     1     FB2_15  11   I/O     O       LOW  SLOW 
+nOE2                           1     1     FB2_16  10   I/O     O       LOW  SLOW 
+BRnW13                         1     3     FB2_18  92   I/O     O       LOW  SLOW 
+D<3>                           4     14    FB3_2   32   I/O     I/O     LOW  SLOW RESET
+D<0>                           4     14    FB3_5   35   I/O     I/O     LOW  SLOW RESET
+Phi2                           3     6     FB3_8   37   I/O     O       LOW  SLOW RESET
+nNMI                           1     1     FB3_12  61   I/O     O       LOW  SLOW 
+BnPFC                          4     5     FB4_4   72   I/O     O       LOW  SLOW 
+B1MHz                          5     9     FB4_6   76   I/O     O       LOW  SLOW RESET
+nSELA                          1     6     FB4_8   68   I/O     O       LOW  SLOW 
+BRnW                           1     1     FB4_11  74   I/O     O       LOW  SLOW 
+BnPFD                          1     1     FB4_13  85   I/O     O       LOW  SLOW 
+nSELT                          1     5     FB4_15  89   I/O     O       LOW  SLOW 
+DIRA                           1     1     FB4_16  86   I/O     O       LOW  SLOW 
+nSELB                          5     7     FB4_17  90   I/O     O       LOW  SLOW 
+
+** 18 Buried Nodes **
+
+Signal                         Total Total Loc     Pwr  Reg Init
+Name                           Pts   Inps          Mode State
+$OpTx$$OpTx$FX_DC$113_INV$161  1     8     FB2_12  LOW  
+$OpTx$$OpTx$FX_DC$109_INV$160  1     4     FB2_13  LOW  
+bank<1>                        3     14    FB2_14  LOW  RESET
+bank<0>                        3     14    FB2_17  LOW  RESET
+syncCount<0>                   1     6     FB3_6   LOW  RESET
+pstate<2>                      2     5     FB3_7   LOW  RESET
+NMID                           2     2     FB3_9   LOW  RESET
+syncCount<1>                   3     7     FB3_10  LOW  RESET
+pstate<3>                      3     5     FB3_11  LOW  RESET
+CEN                            3     12    FB3_13  LOW  RESET
+syncCount<2>                   4     8     FB3_14  LOW  RESET
+pstate<1>                      4     5     FB3_15  LOW  RESET
+pstate<0>                      4     5     FB3_16  LOW  RESET
+BEN                            4     13    FB3_17  LOW  RESET
+AEN                            4     13    FB3_18  LOW  RESET
+$OpTx$$OpTx$FX_DC$114_INV$162  1     16    FB4_12  LOW  
+bankCount<1>                   2     23    FB4_14  LOW  RESET
+bankCount<0>                   3     20    FB4_18  LOW  RESET
+
+** 28 Inputs **
+
+Signal                         Loc     Pin  Pin     Pin     
+Name                                   No.  Type    Use     
+A<3>                           FB1_4   20   I/O     I
+A<1>                           FB1_6   15   I/O     I
+A<0>                           FB1_8   17   I/O     I
+RnW                            FB1_9   22   GCK/I/O I
+CLK16MHz                       FB1_11  23   GCK/I/O GCK
+A<2>                           FB1_12  33   I/O     I
+Phi0                           FB1_14  27   GCK/I/O GCK/I
+A<12>                          FB1_16  39   I/O     I
+A<6>                           FB2_7   3    GTS/I/O I
+A<13>                          FB2_8   97   I/O     I
+A<7>                           FB2_9   99   GSR/I/O I
+A<8>                           FB2_10  1    I/O     I
+A<9>                           FB2_11  4    GTS/I/O I
+A<5>                           FB2_12  6    I/O     I
+A<11>                          FB2_13  8    I/O     I
+A<4>                           FB2_14  9    I/O     I
+A<10>                          FB2_17  12   I/O     I
+nROM13                         FB3_1   41   I/O     I
+nROE                           FB3_3   49   I/O     I
+nRST                           FB3_4   50   I/O     I
+LKD02                          FB3_6   53   I/O     I
+QA                             FB3_10  60   I/O     I
+LKD13                          FB3_11  52   I/O     I
+nPFC                           FB3_17  58   I/O     I
+nPFD                           FB3_18  59   I/O     I
+nNMI1MHz                       FB4_3   71   I/O     I
+R13256KS                       FB4_5   67   I/O     I
+MMCM                           FB4_9   70   I/O     I
+
+Legend:
+Pin No. - ~ - User Assigned
+**************************  Function Block Details  ************************
+Legend:
+Total Pt     - Total product terms used by the macrocell signal
+Imp Pt       - Product terms imported from other macrocells
+Exp Pt       - Product terms exported to other macrocells
+               in direction shown
+Unused Pt    - Unused local product terms remaining in macrocell
+Loc          - Location where logic was mapped in device
+Pin Type/Use - I  - Input             GCK - Global Clock
+               O  - Output            GTS - Global Output Enable
+              (b) - Buried macrocell  GSR - Global Set/Reset
+X(@)         - Signal used as input (wire-AND input) to the macrocell logic.
+               The number of Signals Used may exceed the number of FB Inputs
+               Used due to wire-ANDing in the switch matrix.
+Pin No.      - ~  - User Assigned
+*********************************** FB1  ***********************************
+Number of function block inputs used/remaining:               34/2
+Number of signals used by logic mapping into function block:  34
+Signal              Total   Imp   Exp Unused  Loc     Pin   Pin     Pin
+Name                Pt      Pt    Pt  Pt               #    Type    Use
+D<7>                  4       0     0   1     FB1_1   16    I/O     I/O
+nCE1                  4       0     0   1     FB1_2   13    I/O     O
+D<6>                  4       0     0   1     FB1_3   18    I/O     I/O
+(unused)              0       0     0   5     FB1_4   20    I/O     I
+nCE2                  5       0     0   0     FB1_5   14    I/O     O
+(unused)              0       0     0   5     FB1_6   15    I/O     I
+D<5>                  4       0     0   1     FB1_7   25    I/O     I/O
+(unused)              0       0     0   5     FB1_8   17    I/O     I
+(unused)              0       0     0   5     FB1_9   22    GCK/I/O I
+D<1>                  4       0     0   1     FB1_10  28    I/O     I/O
+(unused)              0       0     0   5     FB1_11  23    GCK/I/O GCK
+(unused)              0       0     0   5     FB1_12  33    I/O     I
+nRST1                 1       0     0   4     FB1_13  36    I/O     O
+(unused)              0       0     0   5     FB1_14  27    GCK/I/O GCK/I
+D<4>                  4       0     0   1     FB1_15  29    I/O     I/O
+(unused)              0       0     0   5     FB1_16  39    I/O     I
+D<2>                  4       0     0   1     FB1_17  30    I/O     I/O
+nCE13                 1       0     0   4     FB1_18  40    I/O     O
+
+Signals Used by Logic in Function Block
+  1: A<0>              13: A<9>              24: R13256KS 
+  2: A<10>             14: RnW               25: nROM13 
+  3: A<11>             15: MMCM              26: nPFC 
+  4: A<12>             16: D<7>.PIN          27: nROE 
+  5: A<13>             17: D<6>.PIN          28: nRST 
+  6: A<1>              18: D<5>.PIN          29: test<1>.LFBK 
+  7: A<2>              19: D<4>.PIN          30: test<2>.LFBK 
+  8: A<3>              20: D<2>.PIN          31: test<4>.LFBK 
+  9: A<4>              21: D<1>.PIN          32: test<5>.LFBK 
+ 10: A<5>              22: Phi0              33: test<6>.LFBK 
+ 11: A<6>              23: QA                34: test<7>.LFBK 
+ 12: A<7>             
+
+Signal                        1         2         3         4 Signals FB
+Name                0----+----0----+----0----+----0----+----0 Used    Inputs
+D<7>                 X....XXXXXXX.X.X.....X...X.X.....X...... 14      14
+nCE1                 .XXXX.......X.X.......XX..X............. 9       9
+D<6>                 X....XXXXXXX.X..X....X...X.X....X....... 14      14
+nCE2                 .XXXX.......X.X.......XX..X............. 9       9
+D<5>                 X....XXXXXXX.X...X...X...X.X...X........ 14      14
+D<1>                 X....XXXXXXX.X......XX...X.XX........... 14      14
+nRST1                ...........................X............ 1       1
+D<4>                 X....XXXXXXX.X....X..X...X.X..X......... 14      14
+D<2>                 X....XXXXXXX.X.....X.X...X.X.X.......... 14      14
+nCE13                ........................X............... 1       1
+                    0----+----1----+----2----+----3----+----4
+                              0         0         0         0
+*********************************** FB2  ***********************************
+Number of function block inputs used/remaining:               32/4
+Number of signals used by logic mapping into function block:  32
+Signal              Total   Imp   Exp Unused  Loc     Pin   Pin     Pin
+Name                Pt      Pt    Pt  Pt               #    Type    Use
+BnRW                  1       0     0   4     FB2_1   87    I/O     O
+S1RnW                 4       0     0   1     FB2_2   94    I/O     O
+nOE13                 1       0   \/2   2     FB2_3   91    I/O     O
+A14                   7       2<-   0   0     FB2_4   93    I/O     O
+S2RnW                10       5<-   0   0     FB2_5   95    I/O     O
+nFCBx                 1       1<- /\5   0     FB2_6   96    I/O     O
+(unused)              0       0   /\1   4     FB2_7   3     GTS/I/O I
+(unused)              0       0     0   5     FB2_8   97    I/O     I
+(unused)              0       0     0   5     FB2_9   99    GSR/I/O I
+(unused)              0       0     0   5     FB2_10  1     I/O     I
+(unused)              0       0     0   5     FB2_11  4     GTS/I/O I
+$OpTx$$OpTx$FX_DC$113_INV$161
+                      1       0     0   4     FB2_12  6     I/O     I
+$OpTx$$OpTx$FX_DC$109_INV$160
+                      1       0     0   4     FB2_13  8     I/O     I
+bank<1>               3       0     0   2     FB2_14  9     I/O     I
+nOE1                  1       0     0   4     FB2_15  11    I/O     O
+nOE2                  1       0     0   4     FB2_16  10    I/O     O
+bank<0>               3       0     0   2     FB2_17  12    I/O     I
+BRnW13                1       0     0   4     FB2_18  92    I/O     O
+
+Signals Used by Logic in Function Block
+  1: $OpTx$$OpTx$FX_DC$114_INV$162  12: BEN               23: Phi0 
+  2: AEN                            13: CEN               24: QA 
+  3: A<10>                          14: RnW               25: R13256KS 
+  4: A<11>                          15: MMCM              26: bank<0>.LFBK 
+  5: A<12>                          16: D<6>.PIN          27: bank<1>.LFBK 
+  6: A<13>                          17: D<5>.PIN          28: bankCount<0> 
+  7: A<4>                           18: D<4>.PIN          29: bankCount<1> 
+  8: A<5>                           19: D<3>.PIN          30: nPFC 
+  9: A<6>                           20: D<2>.PIN          31: nROE 
+ 10: A<7>                           21: D<1>.PIN          32: nRST 
+ 11: A<9>                           22: D<0>.PIN         
+
+Signal                        1         2         3         4 Signals FB
+Name                0----+----0----+----0----+----0----+----0 Used    Inputs
+BnRW                 .............X.......................... 1       1
+S1RnW                .XXXXX....X..XX.......XXX.....X......... 12      12
+nOE13                .............X.......................... 1       1
+A14                  ..XXXX....X...X........XXXX...X......... 11      11
+S2RnW                ..XXXX....XX.XX.......XXXXX...X......... 14      14
+nFCBx                ......XXXX...................X.......... 5       5
+$OpTx$$OpTx$FX_DC$113_INV$161 
+                     ...............XXXXXX......X..X......... 8       8
+$OpTx$$OpTx$FX_DC$109_INV$160 
+                     ...............XXXX..................... 4       4
+bank<1>              X..............XXXXXXX.X..XXX.XX........ 14      14
+nOE1                 .............X.......................... 1       1
+nOE2                 .............X.......................... 1       1
+bank<0>              X..............XXXXXXX.X.X.XX.XX........ 14      14
+BRnW13               ............XX........X................. 3       3
+                    0----+----1----+----2----+----3----+----4
+                              0         0         0         0
+*********************************** FB3  ***********************************
+Number of function block inputs used/remaining:               31/5
+Number of signals used by logic mapping into function block:  31
+Signal              Total   Imp   Exp Unused  Loc     Pin   Pin     Pin
+Name                Pt      Pt    Pt  Pt               #    Type    Use
+(unused)              0       0     0   5     FB3_1   41    I/O     I
+D<3>                  4       0     0   1     FB3_2   32    I/O     I/O
+(unused)              0       0     0   5     FB3_3   49    I/O     I
+(unused)              0       0     0   5     FB3_4   50    I/O     I
+D<0>                  4       0     0   1     FB3_5   35    I/O     I/O
+syncCount<0>          1       0     0   4     FB3_6   53    I/O     I
+pstate<2>             2       0     0   3     FB3_7   54    I/O     (b)
+Phi2                  3       0     0   2     FB3_8   37    I/O     O
+NMID                  2       0     0   3     FB3_9   42    I/O     (b)
+syncCount<1>          3       0     0   2     FB3_10  60    I/O     I
+pstate<3>             3       0     0   2     FB3_11  52    I/O     I
+nNMI                  1       0     0   4     FB3_12  61    I/O     O
+CEN                   3       0     0   2     FB3_13  63    I/O     (b)
+syncCount<2>          4       0     0   1     FB3_14  55    I/O     (b)
+pstate<1>             4       0     0   1     FB3_15  56    I/O     (b)
+pstate<0>             4       0     0   1     FB3_16  65    I/O     (b)
+BEN                   4       0     0   1     FB3_17  58    I/O     I
+AEN                   4       0     0   1     FB3_18  59    I/O     I
+
+Signals Used by Logic in Function Block
+  1: AEN.LFBK          12: RnW               22: nRST 
+  2: A<0>              13: LKD02             23: pstate<0>.LFBK 
+  3: A<1>              14: LKD13             24: pstate<1>.LFBK 
+  4: A<2>              15: D<3>.PIN          25: pstate<2>.LFBK 
+  5: A<3>              16: D<0>.PIN          26: pstate<3>.LFBK 
+  6: A<4>              17: NMID.LFBK         27: syncCount<0>.LFBK 
+  7: A<5>              18: Phi0              28: syncCount<1>.LFBK 
+  8: A<6>              19: Phi2_OBUF.LFBK    29: syncCount<2>.LFBK 
+  9: A<7>              20: nNMI1MHz          30: test<0>.LFBK 
+ 10: BEN.LFBK          21: nPFC              31: test<3>.LFBK 
+ 11: CEN.LFBK         
+
+Signal                        1         2         3         4 Signals FB
+Name                0----+----0----+----0----+----0----+----0 Used    Inputs
+D<3>                 .XXXXXXXX..X..X..X..XX........X......... 14      14
+D<0>                 .XXXXXXXX..X...X.X..XX.......X.......... 14      14
+syncCount<0>         .................X....XXXXX............. 6       6
+pstate<2>            .................X....XXXX.............. 5       5
+Phi2                 .................XX...XXXX.............. 6       6
+NMID                 ...................X.X.................. 2       2
+syncCount<1>         .................X....XXXXXX............ 7       7
+pstate<3>            .................X....XXXX.............. 5       5
+nNMI                 ................X....................... 1       1
+CEN                  .XXXXXXXX.XX........XX.................. 12      12
+syncCount<2>         .................X....XXXXXXX........... 8       8
+pstate<1>            .................X....XXXX.............. 5       5
+pstate<0>            .................X....XXXX.............. 5       5
+BEN                  .XXXXXXXXX.X.X......XX.................. 13      13
+AEN                  XXXXXXXXX..XX.......XX.................. 13      13
+                    0----+----1----+----2----+----3----+----4
+                              0         0         0         0
+*********************************** FB4  ***********************************
+Number of function block inputs used/remaining:               35/1
+Number of signals used by logic mapping into function block:  35
+Signal              Total   Imp   Exp Unused  Loc     Pin   Pin     Pin
+Name                Pt      Pt    Pt  Pt               #    Type    Use
+(unused)              0       0     0   5     FB4_1   66    I/O     
+(unused)              0       0     0   5     FB4_2   64    I/O     
+(unused)              0       0     0   5     FB4_3   71    I/O     I
+BnPFC                 4       0     0   1     FB4_4   72    I/O     O
+(unused)              0       0     0   5     FB4_5   67    I/O     I
+B1MHz                 5       0     0   0     FB4_6   76    I/O     O
+(unused)              0       0     0   5     FB4_7   77    I/O     
+nSELA                 1       0     0   4     FB4_8   68    I/O     O
+(unused)              0       0     0   5     FB4_9   70    I/O     I
+(unused)              0       0     0   5     FB4_10  81    I/O     
+BRnW                  1       0     0   4     FB4_11  74    I/O     O
+$OpTx$$OpTx$FX_DC$114_INV$162
+                      1       0     0   4     FB4_12  82    I/O     (b)
+BnPFD                 1       0     0   4     FB4_13  85    I/O     O
+bankCount<1>          2       0     0   3     FB4_14  78    I/O     (b)
+nSELT                 1       0     0   4     FB4_15  89    I/O     O
+DIRA                  1       0     0   4     FB4_16  86    I/O     O
+nSELB                 5       0     0   0     FB4_17  90    I/O     O
+bankCount<0>          3       0     0   2     FB4_18  79    I/O     (b)
+
+Signals Used by Logic in Function Block
+  1: $OpTx$$OpTx$FX_DC$109_INV$160  13: A<6>               25: nPFC 
+  2: $OpTx$$OpTx$FX_DC$113_INV$161  14: A<7>               26: nROE 
+  3: A<0>                           15: A<8>               27: nRST 
+  4: A<10>                          16: A<9>               28: pstate<0> 
+  5: A<11>                          17: nPFD               29: pstate<1> 
+  6: A<12>                          18: RnW                30: pstate<2> 
+  7: A<13>                          19: D<7>.PIN           31: pstate<3> 
+  8: A<1>                           20: D<2>.PIN           32: syncCount<0> 
+  9: A<2>                           21: D<1>.PIN           33: syncCount<1> 
+ 10: A<3>                           22: Phi0               34: syncCount<2> 
+ 11: A<4>                           23: bankCount<0>.LFBK  35: syncCount<3>.LFBK 
+ 12: A<5>                           24: bankCount<1>.LFBK 
+
+Signal                        1         2         3         4 Signals FB
+Name                0----+----0----+----0----+----0----+----0 Used    Inputs
+BnPFC                ..........XXXX..........X............... 5       5
+B1MHz                .....................X.....XXXXXXXX..... 9       9
+nSELA                ..........XXXX.......X..X............... 6       6
+BRnW                 .................X...................... 1       1
+$OpTx$$OpTx$FX_DC$114_INV$162 
+                     ..XXXXXXXXXXXXXX.XX..................... 16      16
+BnPFD                ................X....................... 1       1
+bankCount<1>         X.XXXXXXXXXXXXXX.XXXX.XX.XX............. 23      23
+nSELT                ..........XXXX..........X............... 5       5
+DIRA                 .................X...................... 1       1
+nSELB                ..........XXXX..X....X..X............... 7       7
+bankCount<0>         .XXXXXXXXXXXXXXX.XX...XX..X............. 20      20
+                    0----+----1----+----2----+----3----+----4
+                              0         0         0         0
+*******************************  Equations  ********************************
+
+********** Mapped Logic **********
+
+
+$OpTx$$OpTx$FX_DC$109_INV$160 <= (D(4).PIN AND NOT D(6).PIN AND NOT D(5).PIN AND NOT D(3).PIN);
+
+
+$OpTx$$OpTx$FX_DC$113_INV$161 <= (D(4).PIN AND D(2).PIN AND D(1).PIN AND NOT D(6).PIN AND 
+	NOT D(5).PIN AND NOT D(3).PIN AND NOT nROE AND NOT bankCount(0));
+
+
+$OpTx$$OpTx$FX_DC$114_INV$162 <= (NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND A(1) AND 
+	A(0) AND A(5) AND A(3) AND A(9) AND A(8) AND A(13) AND A(10) AND 
+	D(7).PIN AND NOT A(12) AND A(11));
+
+
+A14 <= NOT (((NOT A(9) AND R13256KS AND NOT MMCM AND NOT QA AND NOT nROE AND NOT A(11))
+	OR (NOT A(10) AND R13256KS AND NOT MMCM AND NOT QA AND NOT nROE AND NOT A(11))
+	OR (NOT A(13) AND NOT MMCM AND NOT QA AND NOT nROE)
+	OR (NOT R13256KS AND MMCM AND NOT QA AND NOT nROE)
+	OR (MMCM AND NOT QA AND NOT nROE AND NOT bank(0).LFBK)
+	OR (NOT MMCM AND NOT QA AND NOT nROE AND NOT A(12))
+	OR (R13256KS AND MMCM AND QA AND NOT nROE AND NOT bank(1).LFBK)));
+
+FTCPE_AEN: FTCPE port map (AEN,AEN_T,NOT Phi0,NOT nRST,'0');
+AEN_T <= ((LKD02 AND NOT AEN.LFBK)
+	OR (NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND NOT A(1) AND 
+	NOT A(0) AND NOT A(5) AND A(3) AND NOT nPFC AND NOT AEN.LFBK)
+	OR (NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND NOT A(1) AND 
+	A(0) AND NOT A(5) AND A(3) AND NOT nPFC AND NOT LKD02 AND AEN.LFBK));
+
+FDCPE_B1MHz: FDCPE port map (B1MHz,B1MHz_D,NOT CLK16MHz,'0','0');
+B1MHz_D <= ((NOT syncCount(0) AND NOT syncCount(3).LFBK)
+	OR (NOT syncCount(1) AND NOT syncCount(3).LFBK)
+	OR (NOT syncCount(2) AND NOT syncCount(3).LFBK)
+	OR (syncCount(0) AND syncCount(1) AND syncCount(2) AND 
+	syncCount(3).LFBK)
+	OR (NOT Phi0 AND pstate(1) AND pstate(2) AND pstate(0) AND 
+	NOT pstate(3)));
+
+FTCPE_BEN: FTCPE port map (BEN,BEN_T,NOT Phi0,NOT nRST,'0');
+BEN_T <= ((LKD13 AND NOT BEN.LFBK)
+	OR (NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND A(1) AND 
+	NOT A(0) AND NOT A(5) AND A(3) AND NOT nPFC AND NOT BEN.LFBK)
+	OR (NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND A(1) AND 
+	A(0) AND NOT A(5) AND A(3) AND NOT nPFC AND NOT LKD13 AND BEN.LFBK));
+
+
+BRnW <= RnW;
+
+
+BRnW13 <= NOT ((NOT RnW AND Phi0 AND CEN));
+
+
+BnPFC <= NOT (((NOT A(7) AND NOT A(6) AND NOT nPFC)
+	OR (NOT A(6) AND NOT A(4) AND NOT nPFC)
+	OR (NOT A(7) AND NOT A(4) AND NOT A(5) AND NOT nPFC)
+	OR (A(7) AND A(6) AND A(4) AND A(5) AND NOT nPFC)));
+
+
+BnPFD <= nPFD;
+
+
+BnRW <= NOT RnW;
+
+FTCPE_CEN: FTCPE port map (CEN,CEN_T,NOT Phi0,NOT nRST,'0');
+CEN_T <= ((NOT RnW AND A(7) AND A(6) AND A(4) AND NOT A(2) AND A(1) AND 
+	A(0) AND NOT A(5) AND A(3) AND NOT nPFC AND CEN.LFBK)
+	OR (NOT RnW AND A(7) AND A(6) AND A(4) AND NOT A(2) AND A(1) AND 
+	NOT A(0) AND NOT A(5) AND A(3) AND NOT nPFC AND NOT CEN.LFBK));
+
+FTCPE_D0: FTCPE port map (D_I(0),D_T(0),NOT Phi0,'0',NOT nRST);
+D_T(0) <= ((NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND A(1) AND 
+	A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC AND D(0).PIN AND NOT test(0).LFBK)
+	OR (NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND A(1) AND 
+	A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC AND NOT D(0).PIN AND test(0).LFBK));
+D(0) <= D_I(0) when D_OE(0) = '1' else 'Z';
+D_OE(0) <= (RnW AND Phi0 AND A(7) AND A(6) AND A(4) AND A(2) AND 
+	A(1) AND A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC);
+
+FTCPE_D1: FTCPE port map (D_I(1),D_T(1),NOT Phi0,NOT nRST,'0');
+D_T(1) <= ((NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND A(1) AND 
+	A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC AND D(1).PIN AND NOT test(1).LFBK)
+	OR (NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND A(1) AND 
+	A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC AND NOT D(1).PIN AND test(1).LFBK));
+D(1) <= D_I(1) when D_OE(1) = '1' else 'Z';
+D_OE(1) <= (RnW AND Phi0 AND A(7) AND A(6) AND A(4) AND A(2) AND 
+	A(1) AND A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC);
+
+FTCPE_D2: FTCPE port map (D_I(2),D_T(2),NOT Phi0,NOT nRST,'0');
+D_T(2) <= ((NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND A(1) AND 
+	A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC AND D(2).PIN AND NOT test(2).LFBK)
+	OR (NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND A(1) AND 
+	A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC AND NOT D(2).PIN AND test(2).LFBK));
+D(2) <= D_I(2) when D_OE(2) = '1' else 'Z';
+D_OE(2) <= (RnW AND Phi0 AND A(7) AND A(6) AND A(4) AND A(2) AND 
+	A(1) AND A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC);
+
+FTCPE_D3: FTCPE port map (D_I(3),D_T(3),NOT Phi0,NOT nRST,'0');
+D_T(3) <= ((NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND A(1) AND 
+	A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC AND D(3).PIN AND NOT test(3).LFBK)
+	OR (NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND A(1) AND 
+	A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC AND NOT D(3).PIN AND test(3).LFBK));
+D(3) <= D_I(3) when D_OE(3) = '1' else 'Z';
+D_OE(3) <= (RnW AND Phi0 AND A(7) AND A(6) AND A(4) AND A(2) AND 
+	A(1) AND A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC);
+
+FTCPE_D4: FTCPE port map (D_I(4),D_T(4),NOT Phi0,NOT nRST,'0');
+D_T(4) <= ((NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND A(1) AND 
+	A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC AND D(4).PIN AND NOT test(4).LFBK)
+	OR (NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND A(1) AND 
+	A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC AND NOT D(4).PIN AND test(4).LFBK));
+D(4) <= D_I(4) when D_OE(4) = '1' else 'Z';
+D_OE(4) <= (RnW AND Phi0 AND A(7) AND A(6) AND A(4) AND A(2) AND 
+	A(1) AND A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC);
+
+FTCPE_D5: FTCPE port map (D_I(5),D_T(5),NOT Phi0,'0',NOT nRST);
+D_T(5) <= ((NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND A(1) AND 
+	A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC AND D(5).PIN AND NOT test(5).LFBK)
+	OR (NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND A(1) AND 
+	A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC AND NOT D(5).PIN AND test(5).LFBK));
+D(5) <= D_I(5) when D_OE(5) = '1' else 'Z';
+D_OE(5) <= (RnW AND Phi0 AND A(7) AND A(6) AND A(4) AND A(2) AND 
+	A(1) AND A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC);
+
+FTCPE_D6: FTCPE port map (D_I(6),D_T(6),NOT Phi0,'0',NOT nRST);
+D_T(6) <= ((NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND A(1) AND 
+	A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC AND D(6).PIN AND NOT test(6).LFBK)
+	OR (NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND A(1) AND 
+	A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC AND NOT D(6).PIN AND test(6).LFBK));
+D(6) <= D_I(6) when D_OE(6) = '1' else 'Z';
+D_OE(6) <= (RnW AND Phi0 AND A(7) AND A(6) AND A(4) AND A(2) AND 
+	A(1) AND A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC);
+
+FTCPE_D7: FTCPE port map (D_I(7),D_T(7),NOT Phi0,NOT nRST,'0');
+D_T(7) <= ((NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND A(1) AND 
+	A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC AND D(7).PIN AND NOT test(7).LFBK)
+	OR (NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND A(1) AND 
+	A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC AND NOT D(7).PIN AND test(7).LFBK));
+D(7) <= D_I(7) when D_OE(7) = '1' else 'Z';
+D_OE(7) <= (RnW AND Phi0 AND A(7) AND A(6) AND A(4) AND A(2) AND 
+	A(1) AND A(0) AND NOT A(5) AND NOT A(3) AND NOT nPFC);
+
+
+DIRA <= RnW;
+
+
+
+FDCPE_NMID: FDCPE port map (NMID,NOT nNMI1MHz,NOT Phi0,NOT nRST,'0');
+
+FTCPE_Phi2: FTCPE port map (Phi2,Phi2_T,NOT CLK16MHz,'0','0');
+Phi2_T <= ((NOT Phi0 AND Phi2_OBUF.LFBK AND pstate(2).LFBK AND 
+	NOT pstate(3).LFBK)
+	OR (NOT Phi0 AND Phi2_OBUF.LFBK AND NOT pstate(3).LFBK AND 
+	pstate(1).LFBK AND pstate(0).LFBK)
+	OR (NOT Phi2_OBUF.LFBK AND NOT pstate(2).LFBK AND pstate(3).LFBK AND 
+	pstate(1).LFBK AND pstate(0).LFBK));
+
+
+S1RnW <= NOT (((NOT RnW AND Phi0 AND AEN AND R13256KS AND MMCM AND NOT QA AND 
+	NOT nROE)
+	OR (NOT RnW AND Phi0 AND A(13) AND NOT R13256KS AND NOT MMCM AND NOT QA AND 
+	NOT nROE AND A(12))
+	OR (NOT RnW AND Phi0 AND A(13) AND NOT MMCM AND NOT QA AND NOT nROE AND 
+	A(12) AND A(11))
+	OR (NOT RnW AND Phi0 AND A(9) AND A(13) AND A(10) AND NOT MMCM AND 
+	NOT QA AND NOT nROE AND A(12))));
+
+
+S2RnW <= NOT (((NOT A(13) AND NOT R13256KS AND NOT QA AND NOT nROE AND bank(0).LFBK)
+	OR (NOT R13256KS AND MMCM AND NOT QA AND NOT nROE AND bank(0).LFBK)
+	OR (NOT RnW AND Phi0 AND BEN AND R13256KS AND MMCM AND QA AND 
+	NOT nROE)
+	OR (NOT A(9) AND R13256KS AND NOT MMCM AND NOT QA AND NOT nROE AND NOT A(11) AND 
+	bank(0).LFBK)
+	OR (NOT A(10) AND R13256KS AND NOT MMCM AND NOT QA AND NOT nROE AND NOT A(11) AND 
+	bank(0).LFBK)
+	OR (NOT R13256KS AND QA AND NOT nROE AND bank(1).LFBK)
+	OR (NOT MMCM AND QA AND NOT nROE AND bank(1).LFBK)
+	OR (NOT A(13) AND NOT MMCM AND NOT QA AND NOT nROE AND bank(0).LFBK)
+	OR (NOT R13256KS AND NOT QA AND NOT nROE AND NOT A(12) AND bank(0).LFBK)
+	OR (NOT MMCM AND NOT QA AND NOT nROE AND NOT A(12) AND bank(0).LFBK)));
+
+FTCPE_bank0: FTCPE port map (bank(0),bank_T(0),NOT Phi0,NOT nRST,'0');
+bank_T(0) <= ((D(4).PIN AND D(2).PIN AND D(1).PIN AND D(0).PIN AND NOT QA AND 
+	NOT D(6).PIN AND NOT D(5).PIN AND NOT D(3).PIN AND NOT nROE AND NOT bankCount(0) AND 
+	bankCount(1) AND $OpTx$$OpTx$FX_DC$114_INV$162 AND NOT bank(0).LFBK)
+	OR (D(4).PIN AND D(2).PIN AND D(1).PIN AND NOT D(0).PIN AND NOT QA AND 
+	NOT D(6).PIN AND NOT D(5).PIN AND NOT D(3).PIN AND NOT nROE AND NOT bankCount(0) AND 
+	bankCount(1) AND $OpTx$$OpTx$FX_DC$114_INV$162 AND bank(0).LFBK));
+
+FTCPE_bank1: FTCPE port map (bank(1),bank_T(1),NOT Phi0,NOT nRST,'0');
+bank_T(1) <= ((D(4).PIN AND D(2).PIN AND D(1).PIN AND D(0).PIN AND QA AND 
+	NOT D(6).PIN AND NOT D(5).PIN AND NOT D(3).PIN AND NOT nROE AND NOT bankCount(0) AND 
+	bankCount(1) AND $OpTx$$OpTx$FX_DC$114_INV$162 AND NOT bank(1).LFBK)
+	OR (D(4).PIN AND D(2).PIN AND D(1).PIN AND NOT D(0).PIN AND QA AND 
+	NOT D(6).PIN AND NOT D(5).PIN AND NOT D(3).PIN AND NOT nROE AND NOT bankCount(0) AND 
+	bankCount(1) AND $OpTx$$OpTx$FX_DC$114_INV$162 AND bank(1).LFBK));
+
+FDCPE_bankCount0: FDCPE port map (bankCount(0),bankCount_D(0),NOT Phi0,'0','0');
+bankCount_D(0) <= ((RnW AND bankCount(0).LFBK)
+	OR (NOT nRST AND bankCount(0).LFBK)
+	OR (NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND A(1) AND 
+	A(0) AND A(5) AND A(3) AND nRST AND A(9) AND A(8) AND A(13) AND 
+	A(10) AND D(7).PIN AND NOT A(12) AND A(11) AND 
+	$OpTx$$OpTx$FX_DC$113_INV$161 AND NOT bankCount(1).LFBK));
+
+FTCPE_bankCount1: FTCPE port map (bankCount(1),bankCount_T(1),NOT Phi0,'0','0');
+bankCount_T(1) <= ((NOT RnW AND nRST AND bankCount(1).LFBK)
+	OR (NOT RnW AND A(7) AND A(6) AND A(4) AND A(2) AND A(1) AND 
+	A(0) AND A(5) AND A(3) AND nRST AND A(9) AND A(8) AND A(13) AND 
+	A(10) AND D(7).PIN AND D(2).PIN AND D(1).PIN AND NOT nROE AND NOT A(12) AND 
+	A(11) AND $OpTx$$OpTx$FX_DC$109_INV$160 AND bankCount(0).LFBK));
+
+
+nCE1 <= NOT (((R13256KS AND MMCM AND NOT QA AND NOT nROE)
+	OR (A(13) AND NOT R13256KS AND NOT MMCM AND NOT QA AND NOT nROE AND A(12))
+	OR (A(13) AND NOT MMCM AND NOT QA AND NOT nROE AND A(12) AND A(11))
+	OR (A(9) AND A(13) AND A(10) AND NOT MMCM AND NOT QA AND NOT nROE AND 
+	A(12))));
+
+
+nCE13 <= nROM13;
+
+
+nCE2 <= ((nROE)
+	OR (R13256KS AND MMCM AND NOT QA)
+	OR (A(13) AND R13256KS AND NOT QA AND A(12) AND A(11))
+	OR (A(13) AND NOT R13256KS AND NOT MMCM AND NOT QA AND A(12))
+	OR (A(9) AND A(13) AND A(10) AND R13256KS AND NOT QA AND A(12)));
+
+
+nFCBx <= NOT ((A(7) AND NOT A(6) AND A(4) AND A(5) AND NOT nPFC));
+
+
+nNMI_I <= '0';
+nNMI <= nNMI_I when nNMI_OE = '1' else 'Z';
+nNMI_OE <= NMID.LFBK;
+
+
+nOE1 <= NOT RnW;
+
+
+nOE13 <= NOT RnW;
+
+
+nOE2 <= NOT RnW;
+
+
+nRST1_I <= '0';
+nRST1 <= nRST1_I when nRST1_OE = '1' else 'Z';
+nRST1_OE <= NOT nRST;
+
+
+nSELA <= NOT ((Phi0 AND A(7) AND A(6) AND NOT A(4) AND A(5) AND NOT nPFC));
+
+
+nSELB <= NOT (((Phi0 AND NOT nPFD)
+	OR (Phi0 AND NOT A(7) AND NOT A(6) AND NOT nPFC)
+	OR (Phi0 AND NOT A(6) AND NOT A(4) AND NOT nPFC)
+	OR (Phi0 AND NOT A(7) AND NOT A(4) AND NOT A(5) AND NOT nPFC)
+	OR (Phi0 AND A(7) AND A(6) AND A(4) AND A(5) AND NOT nPFC)));
+
+
+nSELT <= NOT ((A(7) AND A(6) AND NOT A(4) AND A(5) AND NOT nPFC));
+
+FDCPE_pstate0: FDCPE port map (pstate(0),pstate_D(0),NOT CLK16MHz,'0','0');
+pstate_D(0) <= ((NOT pstate(2).LFBK AND pstate(3).LFBK AND NOT pstate(0).LFBK)
+	OR (Phi0 AND pstate(2).LFBK AND NOT pstate(3).LFBK AND 
+	pstate(1).LFBK)
+	OR (Phi0 AND NOT pstate(2).LFBK AND NOT pstate(3).LFBK AND 
+	NOT pstate(1).LFBK)
+	OR (Phi0 AND NOT pstate(3).LFBK AND NOT pstate(1).LFBK AND 
+	NOT pstate(0).LFBK));
+
+FDCPE_pstate1: FDCPE port map (pstate(1),pstate_D(1),NOT CLK16MHz,'0','0');
+pstate_D(1) <= ((Phi0 AND pstate(2).LFBK AND NOT pstate(3).LFBK AND 
+	pstate(1).LFBK)
+	OR (Phi0 AND NOT pstate(3).LFBK AND NOT pstate(1).LFBK AND 
+	pstate(0).LFBK)
+	OR (NOT pstate(2).LFBK AND pstate(3).LFBK AND pstate(1).LFBK AND 
+	NOT pstate(0).LFBK)
+	OR (NOT pstate(2).LFBK AND pstate(3).LFBK AND NOT pstate(1).LFBK AND 
+	pstate(0).LFBK));
+
+FDCPE_pstate2: FDCPE port map (pstate(2),pstate_D(2),NOT CLK16MHz,'0','0');
+pstate_D(2) <= ((Phi0 AND pstate(2).LFBK AND NOT pstate(3).LFBK)
+	OR (Phi0 AND NOT pstate(3).LFBK AND pstate(1).LFBK AND 
+	pstate(0).LFBK));
+
+FTCPE_pstate3: FTCPE port map (pstate(3),pstate_T(3),NOT CLK16MHz,'0','0');
+pstate_T(3) <= ((Phi0 AND NOT pstate(3).LFBK)
+	OR (NOT pstate(2).LFBK AND NOT pstate(1).LFBK)
+	OR (NOT pstate(2).LFBK AND NOT pstate(0).LFBK));
+
+FTCPE_syncCount0: FTCPE port map (syncCount(0),syncCount_T(0),NOT CLK16MHz,'0','0');
+syncCount_T(0) <= (NOT Phi0 AND pstate(2).LFBK AND NOT pstate(3).LFBK AND 
+	pstate(1).LFBK AND pstate(0).LFBK AND NOT syncCount(0).LFBK);
+
+FDCPE_syncCount1: FDCPE port map (syncCount(1),syncCount_D(1),NOT CLK16MHz,'0','0');
+syncCount_D(1) <= ((syncCount(0).LFBK AND syncCount(1).LFBK)
+	OR (NOT syncCount(0).LFBK AND NOT syncCount(1).LFBK)
+	OR (NOT Phi0 AND pstate(2).LFBK AND NOT pstate(3).LFBK AND 
+	pstate(1).LFBK AND pstate(0).LFBK));
+
+FDCPE_syncCount2: FDCPE port map (syncCount(2),syncCount_D(2),NOT CLK16MHz,'0','0');
+syncCount_D(2) <= ((NOT syncCount(0).LFBK AND NOT syncCount(2).LFBK)
+	OR (NOT syncCount(1).LFBK AND NOT syncCount(2).LFBK)
+	OR (syncCount(0).LFBK AND syncCount(1).LFBK AND 
+	syncCount(2).LFBK)
+	OR (NOT Phi0 AND pstate(2).LFBK AND NOT pstate(3).LFBK AND 
+	pstate(1).LFBK AND pstate(0).LFBK));
+
+Register Legend:
+ FDCPE (Q,D,C,CLR,PRE); 
+ FTCPE (Q,D,C,CLR,PRE); 
+ LDCP  (Q,D,G,CLR,PRE); 
+
+******************************  Device Pin Out *****************************
+
+Device : XC9572-15-TQ100
+
+
+   --------------------------------------------------  
+  /100 98  96  94  92  90  88  86  84  82  80  78  76  \
+ |   99  97  95  93  91  89  87  85  83  81  79  77    |
+ | 1                                               75  | 
+ | 2                                               74  | 
+ | 3                                               73  | 
+ | 4                                               72  | 
+ | 5                                               71  | 
+ | 6                                               70  | 
+ | 7                                               69  | 
+ | 8                                               68  | 
+ | 9                                               67  | 
+ | 10                                              66  | 
+ | 11                                              65  | 
+ | 12                                              64  | 
+ | 13                XC9572-15-TQ100               63  | 
+ | 14                                              62  | 
+ | 15                                              61  | 
+ | 16                                              60  | 
+ | 17                                              59  | 
+ | 18                                              58  | 
+ | 19                                              57  | 
+ | 20                                              56  | 
+ | 21                                              55  | 
+ | 22                                              54  | 
+ | 23                                              53  | 
+ | 24                                              52  | 
+ | 25                                              51  | 
+ |   27  29  31  33  35  37  39  41  43  45  47  49    |
+  \26  28  30  32  34  36  38  40  42  44  46  48  50  /
+   --------------------------------------------------  
+
+
+Pin Signal                         Pin Signal                        
+No. Name                           No. Name                          
+  1 A<8>                             51 VCC                           
+  2 NC                               52 LKD13                         
+  3 A<6>                             53 LKD02                         
+  4 A<9>                             54 TIE                           
+  5 VCC                              55 TIE                           
+  6 A<5>                             56 TIE                           
+  7 NC                               57 VCC                           
+  8 A<11>                            58 nPFC                          
+  9 A<4>                             59 nPFD                          
+ 10 nOE2                             60 QA                            
+ 11 nOE1                             61 nNMI                          
+ 12 A<10>                            62 GND                           
+ 13 nCE1                             63 TIE                           
+ 14 nCE2                             64 TIE                           
+ 15 A<1>                             65 TIE                           
+ 16 D<7>                             66 TIE                           
+ 17 A<0>                             67 R13256KS                      
+ 18 D<6>                             68 nSELA                         
+ 19 NC                               69 GND                           
+ 20 A<3>                             70 MMCM                          
+ 21 GND                              71 nNMI1MHz                      
+ 22 RnW                              72 BnPFC                         
+ 23 CLK16MHz                         73 NC                            
+ 24 NC                               74 BRnW                          
+ 25 D<5>                             75 GND                           
+ 26 VCC                              76 B1MHz                         
+ 27 Phi0                             77 TIE                           
+ 28 D<1>                             78 TIE                           
+ 29 D<4>                             79 TIE                           
+ 30 D<2>                             80 NC                            
+ 31 GND                              81 TIE                           
+ 32 D<3>                             82 TIE                           
+ 33 A<2>                             83 TDO                           
+ 34 NC                               84 GND                           
+ 35 D<0>                             85 BnPFD                         
+ 36 nRST1                            86 DIRA                          
+ 37 Phi2                             87 BnRW                          
+ 38 VCC                              88 VCC                           
+ 39 A<12>                            89 nSELT                         
+ 40 nCE13                            90 nSELB                         
+ 41 nROM13                           91 nOE13                         
+ 42 TIE                              92 BRnW13                        
+ 43 NC                               93 A14                           
+ 44 GND                              94 S1RnW                         
+ 45 TDI                              95 S2RnW                         
+ 46 NC                               96 nFCBx                         
+ 47 TMS                              97 A<13>                         
+ 48 TCK                              98 VCC                           
+ 49 nROE                             99 A<7>                          
+ 50 nRST                            100 GND                           
+
+
+Legend :  NC  = Not Connected, unbonded pin
+         PGND = Unused I/O configured as additional Ground pin
+         TIE  = Unused I/O floating -- must tie to VCC, GND or other signal
+         VCC  = Dedicated Power Pin
+         GND  = Dedicated Ground Pin
+         TDI  = Test Data In, JTAG pin
+         TDO  = Test Data Out, JTAG pin
+         TCK  = Test Clock, JTAG pin
+         TMS  = Test Mode Select, JTAG pin
+  PROHIBITED  = User reserved pin
+****************************  Compiler Options  ****************************
+
+Following is a list of all global compiler options used by the fitter run.
+
+Device(s) Specified                         : xc9572-15-TQ100
+Optimization Method                         : SPEED
+Multi-Level Logic Optimization              : ON
+Ignore Timing Specifications                : OFF
+Default Register Power Up Value             : LOW
+Keep User Location Constraints              : ON
+What-You-See-Is-What-You-Get                : OFF
+Exhaustive Fitting                          : OFF
+Keep Unused Inputs                          : OFF
+Slew Rate                                   : SLOW
+Power Mode                                  : LOW
+Ground on Unused IOs                        : OFF
+Global Clock Optimization                   : ON
+Global Set/Reset Optimization               : ON
+Global Ouput Enable Optimization            : ON
+FASTConnect/UIM optimzation                 : ON
+Local Feedback                              : ON
+Pin Feedback                                : ON
+Input Limit                                 : 25
+Pterm Limit                                 : 25

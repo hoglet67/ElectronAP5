@@ -6,7 +6,7 @@
 -- Project Name:        Electron AP5
 -- Target Devices:      XC9572
 --
--- Version:             0.60
+-- Version:             0.61
 --
 ----------------------------------------------------------------------------------
 library ieee;
@@ -59,7 +59,7 @@ end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"60";
+constant VERSION : std_logic_vector(7 downto 0) := x"61";
 
 -- Address that must be written to update the banksel register
 constant BANKSEL_ADDR : std_logic_vector(15 downto 0) := x"AFFF";
@@ -310,7 +310,7 @@ begin
             BEN <= '0';
             CEN <= '0';
         elsif falling_edge(Phi0) then
-            if LKD02 = '0' then
+            if LKD02 = '1' then
                 -- lock disable jumper present
                 AEN <= '1';
             else
@@ -322,7 +322,7 @@ begin
                     AEN <= '0';
                 end if;
             end if;
-            if LKD13 = '0' then
+            if LKD13 = '1' then
                 -- lock disable jumper present
                 BEN <= '1';
             else
