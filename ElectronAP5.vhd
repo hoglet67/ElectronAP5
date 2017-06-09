@@ -6,7 +6,7 @@
 -- Project Name:        Electron AP5
 -- Target Devices:      XC9572
 --
--- Version:             0.5F
+-- Version:             0.60
 --
 ----------------------------------------------------------------------------------
 library ieee;
@@ -52,13 +52,14 @@ entity ElectronAP5 is
         nSELA:    out   std_logic;
         nSELB:    out   std_logic;
         nSELT:    out   std_logic;
+        nRST1:    out   std_logic;
         D:        inout std_logic_vector(7 downto 0)
     );
 end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"5F";
+constant VERSION : std_logic_vector(7 downto 0) := x"60";
 
 -- Address that must be written to update the banksel register
 constant BANKSEL_ADDR : std_logic_vector(15 downto 0) := x"AFFF";
@@ -610,4 +611,10 @@ begin
     -- nFCBx decodes address &FCBx
     nFCBx <= '0' when nPFC = '0' and A(7 downto 4) = x"B" else '1';
 
+    -- =============================================
+    -- Reset buffering
+    -- =============================================
+
+    nRST1 <= '0' when nRST = '0' else 'Z';
+    
 end Behavorial;
