@@ -30,7 +30,6 @@ entity ElectronAP5 is
         QA:       in    std_logic;
         MJ0:      in    std_logic;
         RnW:      in    std_logic;
-        SPARE:    in    std_logic;
         A14ROM13: out   std_logic;
         A14ROMS:  out   std_logic;
         B1MHz:    out   std_logic;
@@ -54,15 +53,14 @@ entity ElectronAP5 is
         nSELA:    out   std_logic;
         nSELB:    out   std_logic;
         nSELT:    out   std_logic;
-        nRST1:    out   std_logic;
-        nRST2:    out   std_logic;
+        BnRST:    out   std_logic;
         D:        inout std_logic_vector(7 downto 0)
     );
 end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"90";
+constant VERSION : std_logic_vector(7 downto 0) := x"91";
 
 -- Address that must be written to update the banksel register
 constant BANKSEL_ADDR : std_logic_vector(15 downto 0) := x"AFFF";
@@ -621,10 +619,7 @@ begin
     -- Reset buffering
     -- =============================================
 
-    -- nRST needs to be an open collector output
-    nRST1 <= '0' when nRST = '0' else 'Z';
+    -- BnRST needs to be an open collector output
+    BnRST <= '0' when nRST = '0' else 'Z';
 
-    -- nRST2 needs to be an open collector output    
-    nRST2 <= '0' when nRST = '0' else 'Z';
-    
 end Behavorial;
