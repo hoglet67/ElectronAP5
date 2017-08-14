@@ -60,7 +60,7 @@ end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"91";
+constant VERSION : std_logic_vector(7 downto 0) := x"92";
 
 -- Address that must be written to update the banksel register
 constant BANKSEL_ADDR : std_logic_vector(15 downto 0) := x"AFFF";
@@ -444,16 +444,25 @@ begin
                     --                     Slot 0 B:                    (unmapped)  0000-3FFF (bank 1)
                     --                     Slot 1 A:                    4000-7FFF   C000-FFFF (bank 0)
                     --                     Slot 1 B:                    (unmapped)  8000-BFFF (bank 1)
+
                     if QA = '0' then
                         -- Slot 0/2
                         nCE2 <= '0';
-                        A14ROMS <= '0';       -- this is actually A15 into the 27512
-                        S2RnW <= not bank(0); -- this is actually A14 into the 27512
+                        if RnW = '0' and Phi0 = '1' and AEN = '1' then
+                            S2RnW <= '0';
+                        else
+                            S2RnW <= not bank(0); -- this is actually A14 into the 27512
+                        end if;                        
+                        A14ROMS <= '0';           -- this is actually A15 into the 27512
                     else
                         -- Slot 1/3
                         nCE2 <= '0';
-                        A14ROMS <= '1';       -- this is actually A15 into the 27512
-                        S2RnW <= not bank(1); -- this is actually A14 into the 27512
+                        A14ROMS <= '1';           -- this is actually A15 into the 27512
+                        if RnW = '0' and Phi0 = '1' and BEN = '1' then
+                            S2RnW <= '0';
+                        else
+                            S2RnW <= not bank(1); -- this is actually A14 into the 27512
+                        end if;
                     end if;
 
                 when "01" =>
