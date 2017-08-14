@@ -367,29 +367,29 @@ begin
     --
     -- Jumpers:                      ROM socket 0:      ROM Socket 1:
     --
-    -- 11 - normal/32KB    Device:   256Kb ROM/RAM      256Kb ROM/RAM
+    -- 11 - normal/32KB    Device:   32KB ROM/RAM       32KB ROM/RAM
     --                     Slot 0 A: 0000-3FFF                    (bank 0)
     --                     Slot 0 B: 4000-7FFF                    (bank 1)
     --                     Slot 1 A:                    0000-3FFF (bank 0)
     --                     Slot 1 B:                    4000-7FFF (bank 1)
     --
-    -- 10 - normal/64KB    Device:   empty              256Kb ROM   512Kb ROM
-    --                     Slot 0 A:                    0000-3FFF   4000-7FFF (bank 0)
-    --                     Slot 0 B:                    (unmapped)  0000-3FFF (bank 1)
-    --                     Slot 1 A:                    4000-7FFF   C000-FFFF (bank 0)
-    --                     Slot 1 B:                    (unmapped)  8000-BFFF (bank 1)
+    -- 10 - normal/64KB    Device:   empty              32KB RAM/ROM 64KB ROM
+    --                     Slot 0 A:                    0000-3FFF    4000-7FFF (bank 0)
+    --                     Slot 0 B:                    (unmapped)   0000-3FFF (bank 1)
+    --                     Slot 1 A:                    4000-7FFF    C000-FFFF (bank 0)
+    --                     Slot 1 B:                    (unmapped)   8000-BFFF (bank 1)
     --
-    -- 01 - MMFS/32-64KB   Device:   128Kb RAM          256Kb ROM   512Kb ROM
-    --                     Slot 0 A: 3600-3FFF          0000-35FF   4000-75FF (bank 0)
-    --                     Slot 0 B: 3600-3FFF          (unmapped)  0000-35FF (bank 1)
-    --                     Slot 1 A:                    4000-7FFF   C000-FFFF (bank 0)
-    --                     Slot 1 B:                    (unmapped)  8000-BFFF (bank 1)
+    -- 01 - MMFS/32-64KB   Device:   16KB  RAM          32KB ROM     64KB ROM
+    --                     Slot 0 A: 3600-3FFF          0000-35FF    4000-75FF (bank 0)
+    --                     Slot 0 B: 3600-3FFF          (unmapped)   0000-35FF (bank 1)
+    --                     Slot 1 A:                    4000-7FFF    C000-FFFF (bank 0)
+    --                     Slot 1 B:                    (unmapped)   8000-BFFF (bank 1)
     --
-    -- 00 - ADFS/32-64KB   Device:   128Kb RAM          256Kb ROM   512Kb ROM
-    --                     Slot 0 A: 3000-3FFF          0000-3FFF   4000-6FFF (bank 0)
-    --                     Slot 0 B: 3000-3FFF          (unmapped)  0000-2FFF (bank 1)
-    --                     Slot 1 A:                    4000-7FFF   C000-FFFF (bank 0)
-    --                     Slot 1 B:                    (unmapped)  8000-BFFF (bank 1)
+    -- 00 - ADFS/32-64KB   Device:   16KB  RAM          32KB ROM     64KB ROM
+    --                     Slot 0 A: 3000-3FFF          0000-2FFF    4000-6FFF (bank 0)
+    --                     Slot 0 B: 3000-3FFF          (unmapped)   0000-2FFF (bank 1)
+    --                     Slot 1 A:                    4000-7FFF    C000-FFFF (bank 0)
+    --                     Slot 1 B:                    (unmapped)   8000-BFFF (bank 1)
 
     -- For mode from the two existing jumpers
     mode <= MJ1 & MJ0;
@@ -416,11 +416,11 @@ begin
             case mode is
                 when "11" =>
                     -- Normal/32KB Mode
-                    -- 11 - normal/32KB    Device:   256Kb ROM/RAM      256Kb ROM/RAM
-                    --                     Slot 0 A: 0000-3FFF                    (bank 0)
-                    --                     Slot 0 B: 4000-7FFF                    (bank 1)
-                    --                     Slot 1 A:                    0000-3FFF (bank 0)
-                    --                     Slot 1 B:                    4000-7FFF (bank 1)
+                    -- 11 - normal/32KB    Device:   32KB ROM/RAM        32KB ROM/RAM
+                    --                     Slot 0 A: 0000-3FFF                     (bank 0)
+                    --                     Slot 0 B: 4000-7FFF                     (bank 1)
+                    --                     Slot 1 A:                     0000-3FFF (bank 0)
+                    --                     Slot 1 B:                     4000-7FFF (bank 1)
                     if QA = '0' then
                         -- Slot 0/2
                         nCE1 <= '0';
@@ -439,11 +439,11 @@ begin
 
                 when "10" =>
                     -- Normal/64KB Mode
-                    -- 10 - normal/64KB    Device:   empty              256Kb ROM   512Kb ROM
-                    --                     Slot 0 A:                    0000-3FFF   4000-7FFF (bank 0)
-                    --                     Slot 0 B:                    (unmapped)  0000-3FFF (bank 1)
-                    --                     Slot 1 A:                    4000-7FFF   C000-FFFF (bank 0)
-                    --                     Slot 1 B:                    (unmapped)  8000-BFFF (bank 1)
+                    -- 10 - normal/64KB    Device:   empty              32KB RAM/ROM 64KB ROM
+                    --                     Slot 0 A:                    0000-3FFF    4000-7FFF (bank 0)
+                    --                     Slot 0 B:                    (unmapped)   0000-3FFF (bank 1)
+                    --                     Slot 1 A:                    4000-7FFF    C000-FFFF (bank 0)
+                    --                     Slot 1 B:                    (unmapped)   8000-BFFF (bank 1)
 
                     if QA = '0' then
                         -- Slot 0/2
@@ -467,11 +467,11 @@ begin
 
                 when "01" =>
                     -- MMFS/32-64KB Mode
-                    -- 01 - MMFS/32-64KB   Device:   128Kb RAM          256Kb ROM   512Kb ROM
-                    --                     Slot 0 A: 3600-3FFF          0000-35FF   4000-75FF (bank 0)
-                    --                     Slot 0 B: 3600-3FFF          (unmapped)  0000-35FF (bank 1)
-                    --                     Slot 1 A:                    4000-7FFF   C000-FFFF (bank 0)
-                    --                     Slot 1 B:                    (unmapped)  8000-BFFF (bank 1)
+                    -- 01 - MMFS/32-64KB   Device:   16KB RAM           32KB ROM     64KB ROM
+                    --                     Slot 0 A: 3600-3FFF          0000-35FF    4000-75FF (bank 0)
+                    --                     Slot 0 B: 3600-3FFF          (unmapped)   0000-35FF (bank 1)
+                    --                     Slot 1 A:                    4000-7FFF    C000-FFFF (bank 0)
+                    --                     Slot 1 B:                    (unmapped)   8000-BFFF (bank 1)
                     if QA = '0' then
                         -- Slot 0/2
                         if A(13 downto 8) >= "110110" then
@@ -497,11 +497,11 @@ begin
 
                 when "00" =>
                     -- ADFS/32-64KB Mode
-                    -- 00 - ADFS/32-64KB   Device:   128Kb RAM          256Kb ROM   512Kb ROM
-                    --                     Slot 0 A: 3000-3FFF          0000-3FFF   4000-6FFF (bank 0)
-                    --                     Slot 0 B: 3000-3FFF          (unmapped)  0000-2FFF (bank 1)
-                    --                     Slot 1 A:                    4000-7FFF   C000-FFFF (bank 0)
-                    --                     Slot 1 B:                    (unmapped)  8000-BFFF (bank 1)
+                    -- 00 - ADFS/32-64KB   Device:   16KB RAM           32KB ROM     64KB ROM
+                    --                     Slot 0 A: 3000-3FFF          0000-2FFF    4000-6FFF (bank 0)
+                    --                     Slot 0 B: 3000-3FFF          (unmapped)   0000-2FFF (bank 1)
+                    --                     Slot 1 A:                    4000-7FFF    C000-FFFF (bank 0)
+                    --                     Slot 1 B:                    (unmapped)   8000-BFFF (bank 1)
                     if QA = '0' then
                         -- Slot 0/2
                         if A(13 downto 12) = "11" then
