@@ -60,7 +60,7 @@ end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"92";
+constant VERSION : std_logic_vector(7 downto 0) := x"93";
 
 -- Address that must be written to update the banksel register
 constant BANKSEL_ADDR : std_logic_vector(15 downto 0) := x"AFFF";
@@ -87,7 +87,7 @@ signal NMID      : std_logic := '0';
 
 signal bankCount : unsigned(1 downto 0) := "00";
 
-signal bank      : std_logic_vector(1 downto 0) := "00";
+signal bank      : std_logic_vector(2 downto 0) := "000";
 
 signal mode      : std_logic_vector(1 downto 0);
 
@@ -354,8 +354,8 @@ begin
     -- nOE13 drives nOE of ROM13, disable during writes
     nOE13 <= not RnW;
 
-    -- A14ROM13 is fixed high
-    A14ROM13 <= '1';
+    -- A14ROM13 allows selection between two banks
+    A14ROM13 <= bank(2);
     
     -- Summary of the different ROM modes
     --
@@ -547,14 +547,16 @@ begin
             -- detect writes
             if RnW = '0' then
                 -- detect write to &AFFF
-                if nROE = '0' and A(13 downto 0) = BANKSEL_ADDR(13 downto 0) and D(7 downto 1) = BANKSEL_DATA(7 downto 1) then
+                if (nROE = '0' or nROM13 = '0') and A(13 downto 0) = BANKSEL_ADDR(13 downto 0) and D(7 downto 1) = BANKSEL_DATA(7 downto 1) then
                     -- if this is the third write, then update the bank register
                     if bankCount = BANKSEL_COUNT then
-                        -- select the slot to update based on QA
-                        if QA = '0' then
-                            bank(0) <= D(0);
-                        else
+                        -- select the slot to update based on nROM13 then QA
+                        if nROM13 = '0' then
+                            bank(2) <= D(0);
+                        elsif QA = '1' then
                             bank(1) <= D(0);
+                        else
+                            bank(0) <= D(0);
                         end if;
                         -- reset bankCount
                         bankCount <= "00";
