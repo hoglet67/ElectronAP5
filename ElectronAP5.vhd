@@ -60,7 +60,7 @@ end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"93";
+constant VERSION : std_logic_vector(7 downto 0) := x"94";
 
 -- Address that must be written to update the banksel register
 constant BANKSEL_ADDR : std_logic_vector(15 downto 0) := x"AFFF";
@@ -610,7 +610,7 @@ begin
     BnPFD <= BnPFD_int;
 
     -- nSELB is the enable input to LS245A, asserted for any of the above addresses
-    nSELB <= '0' when (BnPFC_int = '0' or BnPFD_int = '0') and Phi0 = '1' else '1';
+    nSELB <= '0' when (BnPFC_int = '0' or BnPFD_int = '0') else '1';
 
     -- BnRW is the direction input to 74LS245A, A side to Elk, B side to 1MHz Bus
     -- 0: B->A; 1: A->B
