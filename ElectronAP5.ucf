@@ -55,7 +55,7 @@ NET "QA"       LOC = "P64";     # input
 #NET "Spare4"  LOC = "P66";     # spare
 NET "MJ0"      LOC = "P67";     # input
 NET "MJ1"      LOC = "P68";     # input
-#NET "SPARE"   LOC = "P70";     # spare jumper
+NET "SPARE"    LOC = "P70";     # spare jumper
 NET "nNMI1MHz" LOC = "P71";     # input
 NET "BnPFC"    LOC = "P72";     # output
 NET "BRnW"     LOC = "P74";     # output
@@ -78,4 +78,3 @@ NET "S2RnW"    LOC = "P95";     # output
 NET "nFCBx"    LOC = "P96";     # output
 NET "A(13)"    LOC = "P97";     # input
 NET "A(7)"     LOC = "P99";     # input
-

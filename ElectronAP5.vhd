@@ -30,6 +30,7 @@ entity ElectronAP5 is
         QA:       in    std_logic;
         MJ0:      in    std_logic;
         RnW:      in    std_logic;
+        SPARE:    in    std_logic; -- Jumper J3
         A14ROM13: out   std_logic;
         A14ROMS:  out   std_logic;
         B1MHz:    out   std_logic;
@@ -60,7 +61,7 @@ end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"94";
+constant VERSION : std_logic_vector(7 downto 0) := x"95";
 
 -- Address that must be written to update the banksel register
 constant BANKSEL_ADDR : std_logic_vector(15 downto 0) := x"AFFF";
@@ -348,15 +349,15 @@ begin
     -- BnRW13 drives nWE of ROM13, and is a gated version of RnW
     BRnW13 <= '0' when RnW = '0' and CEN = '1' and Phi0 = '1' else '1';
 
-    -- nCE13 drives nCE of ROM13
-    nCE13 <= nROM13;
+    -- nCE13 drives nCE of ROM13, SPARE (J3) disables
+    nCE13 <= '0' when nROM13 = '0' and SPARE = '1' else '1';
 
     -- nOE13 drives nOE of ROM13, disable during writes
     nOE13 <= not RnW;
 
     -- A14ROM13 allows selection between two banks
     A14ROM13 <= bank(2);
-    
+
     -- Summary of the different ROM modes
     --
     -- Note: addresses refer to the address within the device
@@ -452,7 +453,7 @@ begin
                             S2RnW <= '0';
                         else
                             S2RnW <= not bank(0); -- this is actually A14 into the 27512
-                        end if;                        
+                        end if;
                         A14ROMS <= '0';           -- this is actually A15 into the 27512
                     else
                         -- Slot 1/3
