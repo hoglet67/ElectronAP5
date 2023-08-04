@@ -61,7 +61,7 @@ end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"96";
+constant VERSION : std_logic_vector(7 downto 0) := x"97";
 
 -- Address that must be written to update the banksel register
 constant BANKSEL_ADDR : std_logic_vector(15 downto 0) := x"AFFF";
@@ -598,7 +598,7 @@ begin
     BnPFC_int <= '0' when nPFC = '0' and (
         A(7 downto 4) = x"0" or
         A(7 downto 4) = x"1" or
-        A(7 downto 4) = x"2" or
+       (A(7 downto 4) = x"2" and RnW = '0') or -- SID registers are write only
         A(7 downto 4) = x"3" or
         A(7 downto 4) = x"4" or
         A(7 downto 4) = x"8" or
