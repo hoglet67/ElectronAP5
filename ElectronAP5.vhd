@@ -4,9 +4,9 @@
 -- Create Date:         10/4/2017
 -- Module Name:         Electron AP5 CPLD
 -- Project Name:        Electron AP5
--- Target Devices:      XC9572
+-- Target Devices:      XC9572/XC9572XL
 --
--- Version:             0.90
+-- Version:             0.98
 --
 ----------------------------------------------------------------------------------
 library ieee;
@@ -61,7 +61,7 @@ end ElectronAP5;
 
 architecture Behavorial of ElectronAP5 is
 
-constant VERSION : std_logic_vector(7 downto 0) := x"97";
+constant VERSION : std_logic_vector(7 downto 0) := x"98";
 
 -- Address that must be written to update the banksel register
 constant BANKSEL_ADDR : std_logic_vector(15 downto 0) := x"AFFF";
@@ -539,12 +539,9 @@ begin
     nOE2 <= not RnW;
 
     -- Bank select registers
-    process(Phi0, nRST)
+    process(Phi0)
     begin
-        if nRST = '0' then
-            -- default to bank 0 on reset
-            bank <= (others => '0');
-        elsif falling_edge(Phi0) then
+        if falling_edge(Phi0) then
             -- detect writes
             if RnW = '0' then
                 -- detect write to &AFFF
